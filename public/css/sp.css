@@ -1,0 +1,21 @@
+#drawer {
+  width: 80%;
+  overflow: scroll;
+  position: absolute;
+  z-index: 10;
+  margin: 0;
+  background-color: white;
+  left: -100%;
+  top : 51px;
+  float: left;
+}
+.sp_disp_none{
+  display: none;
+}
+#menu_td{
+  width: 25%;
+}
+.right_ad{
+    position:absolute;
+    left:500px;
+}

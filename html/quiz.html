@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quiz</title>
+    <link rel="shortcut icon" href="" />
+    <script src="/plugin/min.js"></script>
+    <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
+    <link rel="stylesheet" href="/css/pc.css{{.CacheV}}" media="only screen and (min-width : 711px)">
+    <link rel="stylesheet" href="/css/sp.css{{.CacheV}}" media="only screen and (max-width : 710px)">
+    <meta name="viewport" content="width=device-width, user-scalable=no" >
+  </head>
+<style>
+.choice {
+  background-color: #F5F5F5;
+  width: 99%;
+  cursor: pointer;
+  padding: 10px;
+  height: 30px;
+  border-bottom: 1px solid white;
+  text-align: left;
+}
+.grey {
+  background-color: grey;
+}
+.ans_u_correct td {
+    height: 50px;
+    width: 12.5%;
+    text-align: center;
+    background-color: rgba(0,255,0,0.2);
+    border-width: 0px 0px;
+}
+.ans_u_incorrect td {
+    height: 50px;
+    width: 12.5%;
+    text-align: center;
+    background-color: rgba(255,0,0,0.2);
+    border-width: 0px 0px;
+}
+.ans_icon {
+    max-width: 35px;
+}
+</style>
+<body>
+<table id="header">
+  <tr>
+  <td id="menu_td">
+    <img src="/img/icon/menu.png" class="icon">
+  </td>
+  <td id="page_news">
+    <a href="/htm/news/"><span id="news_num"></span><img src="/img/icon/mail.png" class="icon"></a>
+  </td>
+  <td>
+    <a href="/forumlist/" ><img src="/img/icon/list.png" class="icon"></a>
+  </td>
+  <td id="page_rank" >
+    <a href="/rank/" ><img src="/img/icon/ranking.png" class="icon"></a>
+  </td>
+  <td id="page_myprofile" >
+    <a href="/htm/myprofile/" ><img src="/img/icon/guest.png" id="page_myimg" class="icon"></a>
+  </td>
+  </tr>
+</table>
+<table id="drawer">
+  <tr><td id="ad_menu"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
+  <tr><td id="page_generate" style="background-color:white;">
+    <a href="/generate/"><img src="/img/icon/pencil.png" class="icon"></a></td></tr>
+  <tr><td>
+    <a href="/">MyQuiz</a></td></tr>
+  <tr><td>
+    <a href="/">Login</a></td></tr>
+  <tr><td id="page_top">
+    <a href="/"><img src="/img/icon/home.png" class="icon"></a></td></tr>
+  <tr><td>
+    <a href="/htm/rule/"><img src="/img/icon/audit.png" class="icon"></a></td></tr>
+</table>
+
+<div id="content">
+
+<div style="position:absolute;top:-10000px;">
+  <!-- if .Q.Sound
+  <audio id="audio" controls><source src=".Q.Sound"></audio>
+  end -->
+  <audio id="audio_correct" controls><source src="/sound/correct.mp3"></audio>
+  <audio id="audio_incorrect" controls><source src="/sound/incorrect.mp3"></audio>
+</div>
+  
+<div id="play">
+
+<div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
+{{ if .Q.QuestionImg}}
+<div id="div_photo">
+  <img src="{{.Q.QuestionImg}}" id="photo">
+</div>
+{{ end }}
+<div id="question" style="padding: 5px 5px 20px 5px;"> No.{{.Q.Sequence}} {{.Q.QuestionTxt}}</div>
+<div id="app" line=151>
+<div id="big_result">
+  <img src="/img/icon/circle_big.png" class="big_icon" id="big_correct" style="display:none;">
+  <img src="/img/icon/cross_big.png" class="big_icon" id="big_incorrect" style="display:none;">
+
+  {{if eq .Q.QuestionType 2}}
+
+  <table class="textbox"><tr><td class="txt_99" id="correct" style="display:none;"><img src="{{.correct}}"></td></tr></table>
+  <table><tr>
+      <td class="choice cho_pic" id="choice_0"><img src="{{.Q.Choice0}}"></td>
+      <td class="choice cho_pic" id="choice_1"><img src="{{.Q.Choice1}}"></td>
+  </tr><tr>
+      <td class="choice cho_pic" id="choice_2"><img src="{{.Q.Choice2}}"></td>
+      <td class="choice cho_pic" id="choice_3"><img src="{{.Q.Choice3}}"></td>
+  </tr></table>
+
+  {{else}}
+  <div v-if="localStorage.qType == 1">
+    <input type="text" style="width:92%;height:50px;" >
+    <div style="width:98%;text-align:right;">
+      <img src="/img/icon/upload_0.png" class="icon" >
+    </div>
+  </div>
+  <table v-if="localStorage.qType == 0">
+    <tr></tr><td class="choice" :click="choose(choices[0][0])">[[ choices[0][1] ]]</td></tr>
+    <tr></tr><td class="choice" :click="choose(choices[1][0])">[[ choices[1][1] ]]</td></tr>
+    <tr></tr><td class="choice" :click="choose(choices[2][0])">[[ choices[2][1] ]]</td></tr>
+    <tr></tr><td class="choice" :click="choose(choices[3][0])">[[ choices[3][1] ]]</td></tr>
+  </table>
+  {{end}}
+
+</div>
+{{ if eq .Q.QuestionType 0 }}
+<table>
+  <tr>
+  <td :class="{ grey: localStorage.qType == 1 }" onclick="chgQtype(1)"> <img src="/img/icon/textbox.png" class="icon"></td>
+  <td :class="{ grey: localStorage.qType == 0 }" onclick="chgQtype(0)"> <img src="/img/icon/choice.png" class="icon"> </td>
+  </tr>
+</table>
+{{ end }}
+<table>
+<tr>
+  <td><img src="/img/icon/circle_big.png" alt="correct ratio" class="icon"></td>
+  <td style="text-align: left;"> [[ AnswerCalc[0] ]] %</td>
+  <td><img src="/img/icon/answer.png" alt="amount of answer" class="icon"></td>
+  <td style="text-align: left;"> [[ AnswerCalc[1] ]] </td>
+</tr>
+</table>
+<table class="ans_u_correct">
+<tr><td v-for="d,k in CorrectUsr" v-if="k < 8">
+  <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
+</td></tr>
+<tr><td v-for="d,k in CorrectUsr" v-if="k >= 8">
+  <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
+</td></tr>
+</table>
+<table class="ans_u_incorrect" >
+  <tr><td v-for="d,k in IncorrectUsr" v-if="k < 8">
+    <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
+  </td></tr>
+  <tr><td v-for="d,k in IncorrectUsr" v-if="k >= 8">
+    <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
+  </td></tr>
+</table>
+
+<textarea placeholder="comment" style="width:92%;margin: 2px;" v-model="commentTxt"></textarea>
+<div style="width:100%;text-align:right;">
+  <img src="/img/icon/upload_0.png" alt="comment" class="icon" v-if="!commented" @click="commenting">
+  <img src="/img/icon/success.png" alt="success" class="icon" v-if="commented">
+</div>
+<table>
+  <tr v-for="d,k in Comment">
+    <td style="width:15%;"><img class="icon" :src="d.UsrImg" :style="d.EtoColor" ></td>
+    <td style="width:84%;text-align:left;">[[ d.CommentTxt ]]</td>
+  </tr>
+</table>
+
+</div>
+
+{{ if .Q.Reference }}
+<div style="word-wrap:break-word;">reference:{{.Q.Reference}}</div>
+{{ end }}
+
+<table><tr>
+  <td style="height:50px;font-size:30px;"><a href="/quiz/?q={{.Q.PreviousQuestion}}"> < </a></td>
+  <td style="height:50px;font-size:30px;"><a href="/quiz/?q={{.Q.NextQuestion}}"> > </a></td>
+</tr></table>
+
+</div>
+
+<div id="ad_right"></div>
+
+</div>
+
+
+<script>
+  var csrf = '{{.CSRF}}';
+  var q_id = '{{.Q.QuestionID}}';
+  var u_id = '{{.Q.UsrID}}';
+  // var usr = 
+</script>
+<script src="/js/common.js{{.CacheV}}"></script>
+
+<script>
+
+var app = new Vue({
+  el: '#app',
+  delimiters: ['[[', ']]'],
+  data: {
+    collect: '{{.Q.Choice0}}',
+    choices: shuffle([
+      [0,'{{.Q.Choice0}}'],
+      [1,'{{.Q.Choice1}}'],
+      [2,'{{.Q.Choice2}}'],
+      [3,'{{.Q.Choice3}}']]),
+    CorrectUsr: [],
+    IncorrectUsr: [],
+    AnswerCalc: [],
+    Comment: [],
+    commentTxt: "",
+    commented: false,
+    sound: null,
+  },
+  methods: {
+    choose: function (k) {
+
+    },
+    commenting: function (k) {
+      console.log(localStorage.myphoto);
+      var param = {
+        csrf : csrf,
+        comment_txt : this.commentTxt,
+        question_id : q_id,
+        usr_img : localStorage.myphoto
+      };
+      $.post('/CommentAdd/',param,function(){},"json")
+      .always(function(res){
+        if(res['Status']==1){
+          location.href = "";
+        }else{
+          console.log(res);
+        }
+      });
+    },
+  }
+});
+console.log(app.choices);
+var click_ele = '#descriptive';
+var clicked = 0;
+
+function shuffle(array) {
+  var m = array.length, t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+localStorage.last_q = q_id;
+
+var q = localStorage.question ? JSON.parse(localStorage.question) : [];
+
+var already = 0;
+for(var i = 0; i < q.length; i++){
+  if(q[i][0] == q_id){
+    already = 1;
+  }
+}
+
+$('.choice').click(function(){
+  // if(clicked == 2){
+  //   return;
+  // }
+  // clicked = 2;
+  $(this).css({ 'background-color' : 'grey' });
+
+  var this_seq = click_ele == '#descriptive' ? $('#txt_answer') : $(this);
+
+  setTimeout(function(){
+    answer_1(this_seq);
+  },1000);
+  answer_day();
+});
+var last_answer_stamp = Math.floor(new Date().getTime() /1000);
+function answer_day(){
+  var answer_stamp = Math.floor(new Date().getTime() /1000);
+  var day_stamp = Math.round(answer_stamp /60 /60 /24);
+  var day_sum = {};
+  var arr_stamp = [0,0];
+  if(localStorage.day_sum){
+    day_sum = JSON.parse(localStorage.day_sum);
+    if(day_sum[day_stamp]){
+      arr_stamp = day_sum[day_stamp];
+    }
+  }
+  arr_stamp[0] = arr_stamp[0] + 1;
+  arr_stamp[1] = arr_stamp[1] + answer_stamp - last_answer_stamp;
+  day_sum[day_stamp] = arr_stamp;
+  localStorage.day_sum = JSON.stringify(day_sum);
+}
+var audio_correct = document.getElementById("audio_correct");
+var audio_incorrect = document.getElementById("audio_incorrect");
+function answer_1(this_seq){
+  var ans_photo = myphoto ? myphoto : '/img/icon/guest.png';
+  if($('#correct').html() == $(this_seq).html() || 
+          ($('#correct').text() == $(this_seq).text() && $('#correct').text())){
+    var correct_answer = 1;
+    resCo.unshift([0,'',ans_photo,'',mybgcolor]);
+    amt_co++;
+    $('#big_correct').css({'display': ''});
+    $(this_seq).css({'background-color': 'lime'});
+    audio_correct.play();
+  }else{
+    var correct_answer = 0; 
+    resInco.unshift([0,'',ans_photo,'',mybgcolor]);
+    $('#big_incorrect').css({'display': ''});
+    $(this_seq).css({'background-color': 'red'});
+    if(click_ele === '#descriptive'){
+      $('#correct').css({
+        'display': '',
+        'background-color': 'lime'
+      });
+    }
+    audio_incorrect.play();
+  }
+
+  $(this_seq).css({
+    'border-width': '1px 1px',
+    'border-color': 'silver',
+    'border-style': 'solid'
+  });
+  $('.cho_pic').css({ 'opacity': '0.3' });
+  $('.choice').each(function(i){
+    if($('#correct').html() == $('#choice_'+i).html()){
+      $('#choice_'+i).css({
+          'background-color':'lime',
+          'opacity':'1'
+      });
+    }
+  });
+
+  if(correct_answer == 1){
+    addCel(resCo,'co');
+  }else{
+    addCel(resInco,'inco');
+  }
+  var tag = [];
+  $('#tag a').each(function(i){
+    tag[i] = $(this).html();
+    localStorage.last_tag = $(this).html();
+  });
+  var q_img = ($('#photo').attr('src'))? $('#photo').attr('src') : '' ;
+  var myphoto_ans = localStorage.myphoto ? localStorage.myphoto : '';
+  var myname_ans = localStorage.myname ? localStorage.myname : '';
+  var param = {
+    csrf : csrf
+    ,correct : correct_answer
+    ,question : q_id
+    ,q_txt : $('#question').html()
+    ,q_img : q_img
+    ,generator : usr
+    ,arr_tag : tag
+    ,u_img : myphoto_ans
+    ,u_name : myname_ans
+    ,choice_0 : $('#choice_0').text() || $('#choice_0 img').attr('src')
+    ,choice_1 : $('#choice_1').text() || $('#choice_1 img').attr('src')
+    ,choice_2 : $('#choice_2').text() || $('#choice_2 img').attr('src')
+    ,choice_3 : $('#choice_3').text() || $('#choice_3 img').attr('src')
+    ,comment : comment_offline
+    ,myanswer : $(this_seq).text() || $(this_seq).children('img').attr('src')
+    ,correct_choice : $('#correct').text() || $('#correct img').attr('src')
+    ,quiz_num : quiz_num
+  };
+  var arr = [
+      $('#question').html()
+      ,$('#choice_0').text() || $('#choice_0 img').attr('src')
+      ,$('#choice_1').text() || $('#choice_1 img').attr('src')
+      ,$('#choice_2').text() || $('#choice_2 img').attr('src')
+      ,$('#choice_3').text() || $('#choice_3 img').attr('src')
+      ,$('#correct').text() || $('#correct img').attr('src')
+      ,q_img
+      ,q_id
+      ,comment_offline
+      ,$(this_seq).text() || $(this_seq).children('img').attr('src')
+      ,quiz_num
+    ];
+  if(already < 1){
+    $.post('/answer/',param,function(){},"json")
+    .always(function(res){
+      if(res[0]==1){
+      }else{
+      }
+    });
+    offline_q.unshift(arr);
+    if(offline_q.length > 199){
+      var diff = offline_q.length - 200;
+      offline_q.splice(-diff, diff);
+    }
+  }else{
+    for(var i = 0; i < offline_q.length; i++){
+      if(offline_q[i][7] == q_id){
+        offline_q[i] = arr;
+      }
+    }
+  }
+  localStorage.offline_q = JSON.stringify(offline_q);
+  amt_answer++;  
+  after_post(correct_answer);
+}
+function after_post(correct_answer){
+  $('#num_ratio').empty().append(Math.round(amt_co/amt_answer * 100)+' %');
+  $('#num_answer').empty().append(amt_answer);
+  if(localStorage.answer_by_u){
+    var answer_by_u = JSON.parse(localStorage.answer_by_u);
+    answer_by_u = [(answer_by_u[0] + correct_answer),(answer_by_u[1] + 1)];
+  }else{
+    var answer_by_u = [correct_answer, 1];
+  }
+  localStorage.answer_by_u = JSON.stringify(answer_by_u);
+  if(answer_by_u[1] > 9){
+    var u_answer = answer_by_u[1] / 10;
+    u_answer = Math.floor(u_answer) * 10;
+  }else{
+    var u_answer = answer_by_u[1];
+  }
+  localStorage.session_answer = localStorage.session_answer*1 + 1;
+
+  var hour_stamp = Math.floor(new Date().getTime() /1000 /60 /60); 
+  var notify = JSON.parse(localStorage.notify);
+  notify[1] = hour_stamp+1;
+  localStorage.notify = JSON.stringify(notify);
+  ticket[0]--;
+  localStorage.ticket = JSON.stringify(ticket);
+  setTimeout(function(){
+    if(next_q){
+      if(iframe){
+        top.window.location.href = 'https://'+domain+'/quiz/?q='+next_q;        
+      }else{
+        location.href = '/quiz/?q='+next_q;
+      }
+    }else{
+      location.href = '/';
+    }
+  },1000);
+}
+
+function answerShow(){
+  var param = {
+    csrf : csrf,
+    q : q_id
+  };
+  $.get('/AnswerShow/',param,function(){},"json")
+  .always(function(res){
+    if(res['Status']==1){
+      app.CorrectUsr = res['CorrectUsr'];
+      app.IncorrectUsr = res['IncorrectUsr'];
+      app.AnswerCalc = res['AnswerCalc'];
+      app.Comment = res['Comment'];
+    }else{
+      console.log(res);
+    }
+  });
+}
+answerShow();
+var amt_co = 0;
+var amt_answer = 0;
+function answer_by_q_show(){
+  var param = {
+    q : q_id
+  };
+  $.get('/answerbyqshow/',param,function(){},"json")
+  .always(function(res){
+    if(res[0]==1){
+      amt_co = res[1][0];
+      amt_answer = res[1][1];
+      if(amt_co == 0){
+        $('#num_ratio').empty().append(0+' %');
+      }else{
+        $('#num_ratio').empty().append(Math.round(amt_co/amt_answer * 100)+' %');
+      }
+      $('#num_answer').empty().append(amt_answer);
+      
+    }else{
+     console.log(res);
+    }
+  });
+}
+var next_q = 0;
+var quiz_num = 0;
+function tag_show(){
+  var param = {
+    q : q_id
+  };
+  $.get('/tagshow/',param,function(){},"json")
+  .always(function(res){
+    if(res[0]==1){
+      for(i = 0; i < res[1].length; i++){
+        $('#tag').append('&nbsp;<a href="/search/?tag='+res[1][i]['txt']+'">#'+res[1][i]['txt']+'</a>&nbsp;');
+
+      }
+      $('#question').prepend(no_+res[1][0]['quiz_num']+mon+' ');
+      quiz_num = res[1][0]['quiz_num'];
+      if(res[3] && res[3][0]){
+        next_q = res[3][0];
+      }
+      addNavi(res,3);
+      addNavi(res,2);
+    }else{
+     //console.log(res);
+    }
+  });
+}
+function addNavi(res,nextPrev) {
+  if(!res[nextPrev] || !res[nextPrev][0]){
+    return;
+  }
+  var append = '';
+  if(res[nextPrev][2]){
+    append = 
+    '<tr><td colspan="15" class="td_15_t">'+
+    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
+    '<img src="'+res[nextPrev][2]+'" alt="quiz" class="icon"></a>'+
+    '</td><td colspan="85" class="td_84_t">'+
+    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
+    no_+res[nextPrev][3]+mon+decodeURIComponent(res[nextPrev][1])+
+    '</a>'+
+    '</td>'+
+    '</tr>';
+  }else{
+    append = 
+    '<tr><td colspan="100" class="td_84_t">'+
+    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
+    no_+res[nextPrev][3]+mon+decodeURIComponent(res[nextPrev][1])+
+    '</a>'+
+    '</td>'+
+    '</tr>';
+  }
+  $('#next_prev').append(append);
+}
+$('#comment_add').click(function(){
+  if(!localStorage.login){
+    alert(please_login);
+    return;
+  }
+  var validate = 1;
+  if($('#comment_data').val().length < 10){
+    alert('you must input more');
+    $('#comment_data').css({'border-color':'red'});
+    validate=2;
+  }
+  if(validate==2){
+    return false;
+  }
+  if(localStorage.quest){
+    var quest = JSON.parse(localStorage.quest);
+    if(quest[6] != 1){
+      quest[6] = 1;
+      localStorage.quest = JSON.stringify(quest);
+      notify[2] = 'yet';
+      notify[3] = 1;
+      notify[4] = notify[4]+1;
+      var news = localStorage.news ? JSON.parse(localStorage.news) : [];
+      news.unshift('<a href="/htm/quest/">'+commented+'<img src="/img/icon/star_1.png"></a>');
+      localStorage.news = JSON.stringify(news);
+      localStorage.notify = JSON.stringify(notify);
+    }
+  }
+  $('#comment_add').css({'display': 'none'});
+  $('#success').css({'display':''});
+  var myphoto = localStorage.myphoto ? localStorage.myphoto : '';
+  var myname = localStorage.myname ? localStorage.myname : '';
+  var param = {
+    csrf : csrf
+    ,txt : $('#comment_data').val()
+    ,q : q_id
+    ,u_img : myphoto
+    ,u_name : myname
+  };
+  $.post('/commentadd/',param,function(){},"json")
+  .always(function(res){
+    if(res[0]==1){
+      location.reload();
+    }else{
+      alert('connection error');
+    }
+  });
+
+  return false;
+});
+
+function chgQtype(qType) {
+  localStorage.qType = qType;
+  setTimeout(function(){
+    location.href = "" ;
+    return;
+  },100);
+}
+
+if(app.sound){
+    var a = document.getElementById("audio");
+    var played = 0;
+    $('#play').click(function(){
+        if(played < 1){ a.play(); }
+        setTimeout(function(){
+          $('a').css({ 'pointer-events': '' });
+          clicked = 0;
+          played = 1;
+        },2000);
+        $('.cho_pic').css({ 'opacity': '1' });
+    });
+}
+
+</script>
+</body>
+</html>
+

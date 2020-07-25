@@ -1,0 +1,41 @@
+package common
+
+import (
+    "fmt"
+    "database/sql"
+    _ "github.com/lib/pq"
+    "log"
+    "net/http"
+    "../common"
+    // "encoding/json"
+    "encoding/base64"
+    "os"
+    "strings"
+    "time"
+    "strconv"
+    // "../table"
+)
+
+const charset = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+
+func InitDB() string {
+	db, err := sql.Open("postgres", common.DB_CONNECT)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
+
+func StringRand(length int) string {
+	return StringWithCharset(length, charset)
+}
+
+func StringReverse(s string) string {
+    rs := []rune(s)
+    for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+        rs[i], rs[j] = rs[j], rs[i]
+    }
+    return string(rs)
+}

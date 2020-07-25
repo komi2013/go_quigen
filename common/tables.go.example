@@ -1,0 +1,311 @@
+package main
+
+// HAnswer represents public.h_answer
+type HAnswer struct {
+	QuestionID       int       // question_id
+	QuestionTxt      string    // question_txt
+	UsrID            int       // usr_id
+	UsrImg           string    // usr_img
+	CreatedAt        time.Time // created_at
+	UpdatedAt        time.Time // updated_at
+	Choice0          string    // choice_0
+	Choice1          string    // choice_1
+	Choice2          string    // choice_2
+	Choice3          string    // choice_3
+	Reference        string    // reference
+	QuestionType     int16     // question_type
+	CategoryID       int       // category_id
+	QuestionImg      string    // question_img
+	PreviousQuestion int       // previous_question
+	NextQuestion     int       // next_question
+	Sequence         int       // sequence
+	Mychoice         int16     // mychoice
+	Spend            int16     // spend
+}
+// Create inserts the HAnswer to the database.
+func (r *HAnswer) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO h_answer (question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, mychoice, spend) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+		&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Mychoice, &r.Spend)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert h_answer")
+	}
+	return nil
+}
+
+// GetHAnswerByPk select the HAnswer from the database.
+func GetHAnswerByPk(db Queryer) (*HAnswer, error) {
+	var r HAnswer
+	err := db.QueryRow(
+		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, mychoice, spend FROM h_answer WHERE `,
+	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Mychoice, &r.Spend)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select h_answer")
+	}
+	return &r, nil
+}
+// MCategoryName represents public.m_category_name
+type MCategoryName struct {
+	CategoryID          int       // category_id
+	CategoryName        string    // category_name
+	UpdatedAt           time.Time // updated_at
+	CategoryDescription string    // category_description
+}
+// Create inserts the MCategoryName to the database.
+func (r *MCategoryName) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO m_category_name (category_id, category_name, updated_at, category_description) VALUES ($1, $2, $3, $4)`,
+		&r.CategoryID, &r.CategoryName, &r.UpdatedAt, &r.CategoryDescription)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert m_category_name")
+	}
+	return nil
+}
+
+// GetMCategoryNameByPk select the MCategoryName from the database.
+func GetMCategoryNameByPk(db Queryer) (*MCategoryName, error) {
+	var r MCategoryName
+	err := db.QueryRow(
+		`SELECT category_id, category_name, updated_at, category_description FROM m_category_name WHERE `,
+	).Scan(&r.CategoryID, &r.CategoryName, &r.UpdatedAt, &r.CategoryDescription)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select m_category_name")
+	}
+	return &r, nil
+}
+// MCategoryQuestion represents public.m_category_question
+type MCategoryQuestion struct {
+	QuestionID int       // question_id
+	CategoryID int       // category_id
+	UpdatedAt  time.Time // updated_at
+}
+// Create inserts the MCategoryQuestion to the database.
+func (r *MCategoryQuestion) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO m_category_question (question_id, category_id, updated_at) VALUES ($1, $2, $3)`,
+		&r.QuestionID, &r.CategoryID, &r.UpdatedAt)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert m_category_question")
+	}
+	return nil
+}
+
+// GetMCategoryQuestionByPk select the MCategoryQuestion from the database.
+func GetMCategoryQuestionByPk(db Queryer) (*MCategoryQuestion, error) {
+	var r MCategoryQuestion
+	err := db.QueryRow(
+		`SELECT question_id, category_id, updated_at FROM m_category_question WHERE `,
+	).Scan(&r.QuestionID, &r.CategoryID, &r.UpdatedAt)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select m_category_question")
+	}
+	return &r, nil
+}
+// MCategoryTree represents public.m_category_tree
+type MCategoryTree struct {
+	LeafID    int       // leaf_id
+	Level1    int       // level_1
+	Level2    int       // level_2
+	Level3    int       // level_3
+	Level4    int       // level_4
+	Level5    int       // level_5
+	Level6    int       // level_6
+	Level7    int       // level_7
+	Level8    int       // level_8
+	UpdatedAt time.Time // updated_at
+}
+// Create inserts the MCategoryTree to the database.
+func (r *MCategoryTree) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO m_category_tree (leaf_id, level_1, level_2, level_3, level_4, level_5, level_6, level_7, level_8, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+		&r.LeafID, &r.Level1, &r.Level2, &r.Level3, &r.Level4, &r.Level5, &r.Level6, &r.Level7, &r.Level8, &r.UpdatedAt)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert m_category_tree")
+	}
+	return nil
+}
+
+// GetMCategoryTreeByPk select the MCategoryTree from the database.
+func GetMCategoryTreeByPk(db Queryer) (*MCategoryTree, error) {
+	var r MCategoryTree
+	err := db.QueryRow(
+		`SELECT leaf_id, level_1, level_2, level_3, level_4, level_5, level_6, level_7, level_8, updated_at FROM m_category_tree WHERE `,
+	).Scan(&r.LeafID, &r.Level1, &r.Level2, &r.Level3, &r.Level4, &r.Level5, &r.Level6, &r.Level7, &r.Level8, &r.UpdatedAt)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select m_category_tree")
+	}
+	return &r, nil
+}
+// MPublicMessage represents public.m_public_message
+type MPublicMessage struct {
+	PublicMessageID  int       // public_message_id
+	PublicMessageTxt string    // public_message_txt
+	UpdatedAt        time.Time // updated_at
+}
+// Create inserts the MPublicMessage to the database.
+func (r *MPublicMessage) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO m_public_message (public_message_id, public_message_txt, updated_at) VALUES ($1, $2, $3)`,
+		&r.PublicMessageID, &r.PublicMessageTxt, &r.UpdatedAt)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert m_public_message")
+	}
+	return nil
+}
+
+// GetMPublicMessageByPk select the MPublicMessage from the database.
+func GetMPublicMessageByPk(db Queryer) (*MPublicMessage, error) {
+	var r MPublicMessage
+	err := db.QueryRow(
+		`SELECT public_message_id, public_message_txt, updated_at FROM m_public_message WHERE `,
+	).Scan(&r.PublicMessageID, &r.PublicMessageTxt, &r.UpdatedAt)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select m_public_message")
+	}
+	return &r, nil
+}
+// TComment represents public.t_comment
+type TComment struct {
+	CommentID  int       // comment_id
+	CommentTxt string    // comment_txt
+	UsrID      int       // usr_id
+	QuestionID int       // question_id
+	CreatedAt  time.Time // created_at
+	UsrImg     string    // usr_img
+}
+// Create inserts the TComment to the database.
+func (r *TComment) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO t_comment (comment_id, comment_txt, usr_id, question_id, created_at, usr_img) VALUES ($1, $2, $3, $4, $5, $6)`,
+		&r.CommentID, &r.CommentTxt, &r.UsrID, &r.QuestionID, &r.CreatedAt, &r.UsrImg)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert t_comment")
+	}
+	return nil
+}
+
+// GetTCommentByPk select the TComment from the database.
+func GetTCommentByPk(db Queryer) (*TComment, error) {
+	var r TComment
+	err := db.QueryRow(
+		`SELECT comment_id, comment_txt, usr_id, question_id, created_at, usr_img FROM t_comment WHERE `,
+	).Scan(&r.CommentID, &r.CommentTxt, &r.UsrID, &r.QuestionID, &r.CreatedAt, &r.UsrImg)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select t_comment")
+	}
+	return &r, nil
+}
+// TMessage represents public.t_message
+type TMessage struct {
+	MessageID  int       // message_id
+	Sender     int       // sender
+	Receiver   int       // receiver
+	MessageTxt string    // message_txt
+	CreatedAt  time.Time // created_at
+	MessageImg string    // message_img
+}
+// Create inserts the TMessage to the database.
+func (r *TMessage) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO t_message (message_id, sender, receiver, message_txt, created_at, message_img) VALUES ($1, $2, $3, $4, $5, $6)`,
+		&r.MessageID, &r.Sender, &r.Receiver, &r.MessageTxt, &r.CreatedAt, &r.MessageImg)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert t_message")
+	}
+	return nil
+}
+
+// GetTMessageByPk select the TMessage from the database.
+func GetTMessageByPk(db Queryer) (*TMessage, error) {
+	var r TMessage
+	err := db.QueryRow(
+		`SELECT message_id, sender, receiver, message_txt, created_at, message_img FROM t_message WHERE `,
+	).Scan(&r.MessageID, &r.Sender, &r.Receiver, &r.MessageTxt, &r.CreatedAt, &r.MessageImg)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select t_message")
+	}
+	return &r, nil
+}
+// TQuestion represents public.t_question
+type TQuestion struct {
+	QuestionID       int       // question_id
+	QuestionTxt      string    // question_txt
+	UsrID            int       // usr_id
+	UsrImg           string    // usr_img
+	CreatedAt        time.Time // created_at
+	UpdatedAt        time.Time // updated_at
+	Choice0          string    // choice_0
+	Choice1          string    // choice_1
+	Choice2          string    // choice_2
+	Choice3          string    // choice_3
+	Reference        string    // reference
+	QuestionType     int16     // question_type
+	CategoryID       int       // category_id
+	QuestionImg      string    // question_img
+	PreviousQuestion int       // previous_question
+	NextQuestion     int       // next_question
+	Sequence         int       // sequence
+}
+// Create inserts the TQuestion to the database.
+func (r *TQuestion) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO t_question (question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+		&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert t_question")
+	}
+	return nil
+}
+
+// GetTQuestionByPk select the TQuestion from the database.
+func GetTQuestionByPk(db Queryer) (*TQuestion, error) {
+	var r TQuestion
+	err := db.QueryRow(
+		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence FROM t_question WHERE `,
+	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select t_question")
+	}
+	return &r, nil
+}
+// TUsr represents public.t_usr
+type TUsr struct {
+	UsrID        int       // usr_id
+	PvUID        string    // pv_u_id
+	Provider     int       // provider
+	UsrName      string    // usr_name
+	UsrImg       string    // usr_img
+	UpdatedAt    time.Time // updated_at
+	Point        int       // point
+	Introduce    string    // introduce
+	Nice         int       // nice
+	Certify      int       // certify
+	Quiz         int       // quiz
+	Forum        int       // forum
+	ForumComment int       // forum_comment
+	Latitude     float64   // latitude
+	Longitude    float64   // longitude
+	PushTokens   []byte    // push_tokens
+}
+// Create inserts the TUsr to the database.
+func (r *TUsr) Create(db Queryer) error {
+	_, err := db.Exec(
+		`INSERT INTO t_usr (usr_id, pv_u_id, provider, usr_name, usr_img, updated_at, point, introduce, nice, certify, quiz, forum, forum_comment, latitude, longitude, push_tokens) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+		&r.UsrID, &r.PvUID, &r.Provider, &r.UsrName, &r.UsrImg, &r.UpdatedAt, &r.Point, &r.Introduce, &r.Nice, &r.Certify, &r.Quiz, &r.Forum, &r.ForumComment, &r.Latitude, &r.Longitude, &r.PushTokens)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert t_usr")
+	}
+	return nil
+}
+
+// GetTUsrByPk select the TUsr from the database.
+func GetTUsrByPk(db Queryer, pk0 int) (*TUsr, error) {
+	var r TUsr
+	err := db.QueryRow(
+		`SELECT usr_id, pv_u_id, provider, usr_name, usr_img, updated_at, point, introduce, nice, certify, quiz, forum, forum_comment, latitude, longitude, push_tokens FROM t_usr WHERE usr_id = $1`,
+		pk0).Scan(&r.UsrID, &r.PvUID, &r.Provider, &r.UsrName, &r.UsrImg, &r.UpdatedAt, &r.Point, &r.Introduce, &r.Nice, &r.Certify, &r.Quiz, &r.Forum, &r.ForumComment, &r.Latitude, &r.Longitude, &r.PushTokens)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select t_usr")
+	}
+	return &r, nil
+}
