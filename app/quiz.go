@@ -39,30 +39,16 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         CSRF string
         Q common.TQuestion
     }
-    view := &View{
-        CacheV : common.CACHE_V,
-        CSRF : common.MakeCSRF(w,r),
-        Q : question,
-    }
-    cookie, err := r.Cookie("xsssr")
-    value := ""
-    if err == nil {
-        value = cookie.Value
-	}
-    // fmt.Println("koutei")
-    fmt.Printf("%#v\n", value)
+    // view := &View{
+    //     CacheV : common.CACHE_V,
+    //     CSRF : common.MakeCSRF(w,r),
+    //     Q : question,
+    // }
+    var view View
+    view.CacheV = common.CACHE_V
+    view.CSRF = common.MakeCSRF(w,r)
+    view.Q = question
+
     tpl := template.Must(template.ParseFiles("html/quiz.html"))
     tpl.Execute(w, view)
-
 }
-
-// func GetTQuestionByPk(db Queryer) (*TQuestion, error) {
-// 	var r TQuestion
-// 	err := db.QueryRow(
-// 		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence FROM t_question WHERE `,
-// 	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence)
-// 	if err != nil {
-// 		return nil, errors.Wrap(err, "failed to select t_question")
-// 	}
-// 	return &r, nil
-// }

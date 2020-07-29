@@ -12,7 +12,6 @@
   </head>
 <style>
 .choice {
-  background-color: #F5F5F5;
   width: 99%;
   cursor: pointer;
   padding: 10px;
@@ -93,35 +92,34 @@
   <img src="{{.Q.QuestionImg}}" id="photo">
 </div>
 {{ end }}
-<div id="question" style="padding: 5px 5px 20px 5px;"> No.{{.Q.Sequence}} {{.Q.QuestionTxt}}</div>
+<div style="padding: 5px 5px 20px 5px;"> No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span> </div>
 <div id="app" line=151>
-<div id="big_result">
-  <img src="/img/icon/circle_big.png" class="big_icon" id="big_correct" style="display:none;">
-  <img src="/img/icon/cross_big.png" class="big_icon" id="big_incorrect" style="display:none;">
-
+<div style="position: relative;">
+  <div style="position: absolute; width:100%; text-align: center;">
+  <img src="/img/icon/circle_big.png" class="big_icon" v-if="circle">
+  <img src="/img/icon/cross_big.png" class="big_icon" v-if="cross">
+  </div>
   {{if eq .Q.QuestionType 2}}
-
-  <table class="textbox"><tr><td class="txt_99" id="correct" style="display:none;"><img src="{{.correct}}"></td></tr></table>
   <table><tr>
-      <td class="choice cho_pic" id="choice_0"><img src="{{.Q.Choice0}}"></td>
-      <td class="choice cho_pic" id="choice_1"><img src="{{.Q.Choice1}}"></td>
+      <td class="cho_pic" @click="choose(0)"><img src="{{.Q.Choice0}}"></td>
+      <td class="cho_pic" @click="choose(1)"><img src="{{.Q.Choice1}}"></td>
   </tr><tr>
-      <td class="choice cho_pic" id="choice_2"><img src="{{.Q.Choice2}}"></td>
-      <td class="choice cho_pic" id="choice_3"><img src="{{.Q.Choice3}}"></td>
+      <td class="cho_pic" @click="choose(2)"><img src="{{.Q.Choice2}}"></td>
+      <td class="cho_pic" @click="choose(3)"><img src="{{.Q.Choice3}}"></td>
   </tr></table>
 
   {{else}}
   <div v-if="localStorage.qType == 1">
-    <input type="text" style="width:92%;height:50px;" >
-    <div style="width:98%;text-align:right;">
+    <input type="text" style="width:92%;height:50px;" v-model="choiceTxt" >
+    <div style="width:98%;text-align:right;" v-if="choiceTxt" @click="describe">
       <img src="/img/icon/upload_0.png" class="icon" >
     </div>
   </div>
   <table v-if="localStorage.qType == 0">
-    <tr></tr><td class="choice" :click="choose(choices[0][0])">[[ choices[0][1] ]]</td></tr>
-    <tr></tr><td class="choice" :click="choose(choices[1][0])">[[ choices[1][1] ]]</td></tr>
-    <tr></tr><td class="choice" :click="choose(choices[2][0])">[[ choices[2][1] ]]</td></tr>
-    <tr></tr><td class="choice" :click="choose(choices[3][0])">[[ choices[3][1] ]]</td></tr>
+    <tr></tr><td class="choice" @click="choose(0)" :style="choices[0][2]" >[[ choices[0][1] ]]</td></tr>
+    <tr></tr><td class="choice" @click="choose(1)" :style="choices[1][2]" >[[ choices[1][1] ]]</td></tr>
+    <tr></tr><td class="choice" @click="choose(2)" :style="choices[2][2]" >[[ choices[2][1] ]]</td></tr>
+    <tr></tr><td class="choice" @click="choose(3)" :style="choices[3][2]" >[[ choices[3][1] ]]</td></tr>
   </table>
   {{end}}
 
@@ -158,7 +156,7 @@
     <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
   </td></tr>
 </table>
-
+<div style="padding: 5px 5px 20px 5px;" id="explanation">{{.Q.Explanation}}</div>
 <textarea placeholder="comment" style="width:92%;margin: 2px;" v-model="commentTxt"></textarea>
 <div style="width:100%;text-align:right;">
   <img src="/img/icon/upload_0.png" alt="comment" class="icon" v-if="!commented" @click="commenting">
@@ -174,7 +172,7 @@
 </div>
 
 {{ if .Q.Reference }}
-<div style="word-wrap:break-word;">reference:{{.Q.Reference}}</div>
+<div style="word-wrap:break-word;" id="reference">reference: {{.Q.Reference}}</div>
 {{ end }}
 
 <table><tr>
@@ -188,29 +186,30 @@
 
 </div>
 
-
-<script>
-  var csrf = '{{.CSRF}}';
-  var q_id = '{{.Q.QuestionID}}';
-  var u_id = '{{.Q.UsrID}}';
-  // var usr = 
-</script>
 <script src="/js/common.js{{.CacheV}}"></script>
 
 <script>
+
+var second_stamp = Math.floor(new Date().getTime() /1000);
+var csrf = '{{.CSRF}}';
+var q_id = '{{.Q.QuestionID}}';
+var u_id = 0;
 
 var app = new Vue({
   el: '#app',
   delimiters: ['[[', ']]'],
   data: {
-    collect: '{{.Q.Choice0}}',
+    preChoices:['{{.Q.Choice0}}','{{.Q.Choice1}}','{{.Q.Choice2}}','{{.Q.Choice3}}'],
     choices: shuffle([
-      [0,'{{.Q.Choice0}}'],
-      [1,'{{.Q.Choice1}}'],
-      [2,'{{.Q.Choice2}}'],
-      [3,'{{.Q.Choice3}}']]),
-    CorrectUsr: [],
-    IncorrectUsr: [],
+      [0,'{{.Q.Choice0}}','background-color: #F5F5F5;'],
+      [1,'{{.Q.Choice1}}','background-color: #F5F5F5;'],
+      [2,'{{.Q.Choice2}}','background-color: #F5F5F5;'],
+      [3,'{{.Q.Choice3}}','background-color: #F5F5F5;'] ]),
+    choiceTxt: '',
+    circle: false,
+    cross: false,
+    CorrectUsr: [['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['','']],
+    IncorrectUsr: [['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['',''],['','']],
     AnswerCalc: [],
     Comment: [],
     commentTxt: "",
@@ -218,8 +217,39 @@ var app = new Vue({
     sound: null,
   },
   methods: {
-    choose: function (k) {
-
+    choose: function (choiced) {
+      this.$set(this.choices[choiced],[2],'background-color: grey;');
+      setTimeout(function(){
+        for(var i = 0; i < app.choices.length; i++){
+          if(app.choices[i][0] == 0){
+            app.choices[i][2] = 'background-color: lime;';
+          }
+        }
+        var correct = 0;
+        if(app.choices[choiced][0] == 0){
+          correct = 1;
+        } else {
+          app.choices[choiced][2] = 'background-color: red;';
+        }
+        UIeffect(correct);
+      },1000);
+      saveLocal(correct);
+      if(qi == -1){
+        posting(this.choices[choiced][0]);
+      }
+    },
+    describe: function (e) {
+      var correct = 0;
+      if(this.choiceTxt == this.preChoices[0]){
+        correct = 1;
+      }
+      setTimeout(function(){
+        UIeffect(correct);
+      },1000);
+      saveLocal(correct);
+      if(qi == -1){
+        posting(-1);
+      }
     },
     commenting: function (k) {
       console.log(localStorage.myphoto);
@@ -240,9 +270,6 @@ var app = new Vue({
     },
   }
 });
-console.log(app.choices);
-var click_ele = '#descriptive';
-var clicked = 0;
 
 function shuffle(array) {
   var m = array.length, t, i;
@@ -255,30 +282,93 @@ function shuffle(array) {
   return array;
 }
 localStorage.last_q = q_id;
-
-var q = localStorage.question ? JSON.parse(localStorage.question) : [];
-
-var already = 0;
-for(var i = 0; i < q.length; i++){
-  if(q[i][0] == q_id){
-    already = 1;
+        
+var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
+var qi = -1;
+for(var i = 0; i < localQ.length; i++){
+  if(localQ[i][0] == q_id){
+    qi = i;
   }
 }
 
-$('.choice').click(function(){
-  // if(clicked == 2){
-  //   return;
-  // }
-  // clicked = 2;
-  $(this).css({ 'background-color' : 'grey' });
+var audio_correct = document.getElementById("audio_correct");
+var audio_incorrect = document.getElementById("audio_incorrect");
+function UIeffect(correct){
+  if(correct == 1){
+    app.circle = true;
+    audio_correct.play();
+  }else{
+    app.cross = true;
+    audio_incorrect.play();
+  }
+}
+function saveLocal(correct){
+  var arrQ = [
+    q_id
+    ,$('#question_txt').html()
+    ,app.preChoices
+    ,$('#reference').html() ? $('#reference').html() : ''
+    ,'{{.Q.QuestionType}}'
+    ,'{{.Q.QuestionImg}}'
+    ,correct
+    ,$('#explanation').html()
+  ];
+  if(qi > -1){
+    localQ[qi] = arrQ;
+  } else {
+    localQ.unshift(arrQ);
+  }
+  if(localQ.length > 199){
+    var diff = localQ.length - 200;
+    localQ.splice(-diff, diff);
+  }
+  localStorage.q = JSON.stringify(localQ);
+  var spent = Math.floor(new Date().getTime() /1000) - second_stamp;
+  var daily = localStorage.daily ? JSON.parse(localStorage.daily) : {};
+  var today = new Date().getFullYear() + '-' + (new Date().getMonth()+1) + '-' + new Date().getDate()
+  daily[today] = daily[today] ? daily[today] + spent : spent ;
+  localStorage.daily = JSON.stringify(daily);
+}
+function posting(mychoice){
+  var param = {
+    csrf           : csrf
+    ,question_id   : q_id
+    ,question_txt  : $('#question_txt').html()
+    ,generator_id  : '{{.Q.UsrID}}'
+    ,generator_img : '{{.Q.UsrImg}}'
+    ,asked_at      : '{{.Q.UpdatedAt}}'
+    ,preChoices    : app.preChoices
+    ,reference     : $('#reference').html()
+    ,question_type : '{{.Q.QuestionType}}'
+    ,category_id   : '{{.Q.CategoryID}}'
+    ,question_img  : '{{.Q.QuestionImg}}'
+    ,respondent_id : u_id
+    ,respondent_img: myphoto
+    ,sequence      : '{{.Q.Sequence}}'
+    ,mytext        : app.choiceTxt
+    ,spend         : Math.floor(new Date().getTime() /1000) - second_stamp
+    ,mychoice      : mychoice
+    ,explanation   : $('#explanation').html()
+  };
+  $.post('/answer/',param,function(){},"json")
+  .always(function(res){});
 
-  var this_seq = click_ele == '#descriptive' ? $('#txt_answer') : $(this);
+}
 
-  setTimeout(function(){
-    answer_1(this_seq);
-  },1000);
-  answer_day();
-});
+// $('.choice').click(function(){
+//   // if(clicked == 2){
+//   //   return;
+//   // }
+//   // clicked = 2;
+//   $(this).css({ 'background-color' : 'grey' });
+
+//   var this_seq = click_ele == '#descriptive' ? $('#txt_answer') : $(this);
+
+//   setTimeout(function(){
+//     answer_1(this_seq);
+//   },1000);
+//   answer_day();
+// });
 var last_answer_stamp = Math.floor(new Date().getTime() /1000);
 function answer_day(){
   var answer_stamp = Math.floor(new Date().getTime() /1000);
@@ -296,8 +386,7 @@ function answer_day(){
   day_sum[day_stamp] = arr_stamp;
   localStorage.day_sum = JSON.stringify(day_sum);
 }
-var audio_correct = document.getElementById("audio_correct");
-var audio_incorrect = document.getElementById("audio_incorrect");
+
 function answer_1(this_seq){
   var ans_photo = myphoto ? myphoto : '/img/icon/guest.png';
   if($('#correct').html() == $(this_seq).html() || 

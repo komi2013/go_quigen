@@ -22,7 +22,7 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-    rows, err := db.Query("SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence, mytext, mychoice FROM h_answer WHERE question_id = $1", r.FormValue("q"))
+    rows, err := db.Query("SELECT choice_0, created_at, respondent_id, respondent_img, mytext, mychoice, count FROM h_answer WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
         panic(err)
     }
@@ -31,11 +31,11 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     var correctNum float64 = 0
     for rows.Next() {
         r := common.HAnswer{}
-        if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Mytext, &r.Mychoice); err != nil {
+        if err := rows.Scan(&r.Choice0, &r.CreatedAt, &r.RespondentID, &r.RespondentImg, &r.Mytext, &r.Mychoice, &r.Count); err != nil {
             log.Fatal(err)
         }
         answer = append(answer,r)
-        if r.QuestionTxt == r.Mytext || r.Mychoice == 0 {
+        if r.Choice0 == r.Mytext || r.Mychoice == 0 {
             correctNum++
         }
         count++
@@ -53,29 +53,24 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     var correctUsr [16][2]string
     var incorrectUsr [16][2]string
 
-    fmt.Printf("%#v\n", answer)
-
     coU := 0
     inU := 0
     for _, d := range answer {
-        if d.UsrImg == "" {
-            eto := common.Eto(d.UsrID)
-            d.UsrImg = eto[0]
+        if d.RespondentImg == "" {
+            eto := common.Eto(d.RespondentID)
+            d.RespondentImg = eto[0]
             d.EtoColor = eto[1]
         }
-        if (d.QuestionTxt == d.Mytext || d.Mychoice == 0) && coU < 16 {
-            correctUsr[coU][0] = d.UsrImg
+        if (d.Choice0 == d.Mytext || d.Mychoice == 0) && coU < 16 {
+            correctUsr[coU][0] = d.RespondentImg
             correctUsr[coU][1] = "background-color:#" + d.EtoColor
             coU++
-        } else if (d.QuestionTxt != d.Mytext || d.Mychoice != 0) && inU < 16 {
-            incorrectUsr[inU][0] = d.UsrImg
+        } else if (d.Choice0 != d.Mytext && d.Mychoice != 0) && inU < 16 {
+            incorrectUsr[inU][0] = d.RespondentImg
             incorrectUsr[inU][1] = "background-color:#" + d.EtoColor
             inU++
         }
-        // fmt.Printf("index: %d, name: %s\n", i, s)
     }
-    
-    
 
     rows, err = db.Query("SELECT comment_txt,usr_id,question_id,usr_img,created_at FROM t_comment WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
@@ -105,14 +100,19 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
         AnswerCalc   [2]float64
         Comment      []common.TComment
     }
-    var arr *Arr
-    arr = &Arr{
-        Status: 1,
-        CorrectUsr: correctUsr,
-        IncorrectUsr: incorrectUsr,
-        AnswerCalc: answerCalc,
-        Comment: comment,
-    }
+    var arr Arr
+    // arr = &Arr{  //pointer but not necessary
+    //     Status: 1,
+    //     CorrectUsr: correctUsr,
+    //     IncorrectUsr: incorrectUsr,
+    //     AnswerCalc: answerCalc,
+    //     Comment: comment,
+    // }
+    arr.Status = 1
+    arr.CorrectUsr = correctUsr
+    arr.IncorrectUsr = incorrectUsr
+    arr.AnswerCalc = answerCalc
+    arr.Comment = comment
     res, _ := json.Marshal(arr)
     // fmt.Printf("%#v\n", res)
     fmt.Fprint(w, string(res))

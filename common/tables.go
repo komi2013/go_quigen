@@ -5,27 +5,29 @@ import (
 )
 
 type HAnswer struct {
-	QuestionID       int       // question_id
-	QuestionTxt      string    // question_txt
-	UsrID            int       // usr_id
-	UsrImg           string    // usr_img
-	CreatedAt        time.Time // created_at
-	UpdatedAt        time.Time // updated_at
-	Choice0          string    // choice_0
-	Choice1          string    // choice_1
-	Choice2          string    // choice_2
-	Choice3          string    // choice_3
-	Reference        string    // reference
-	QuestionType     int16     // question_type
-	CategoryID       int       // category_id
-	QuestionImg      string    // question_img
-	PreviousQuestion int       // previous_question
-	NextQuestion     int       // next_question
-	Sequence         int       // sequence
-	Mytext         string     // mytext
-	Spend            int16     // spend
-	Mychoice            int16     // mychoice
-	EtoColor         string     // not in table
+	QuestionID    int       // question_id
+	QuestionTxt   string    // question_txt
+	GeneratorID   int       // generator_id
+	GeneratorImg  string    // generator_img
+	AskedAt       time.Time // asked_at
+	Choice0       string    // choice_0
+	Choice1       string    // choice_1
+	Choice2       string    // choice_2
+	Choice3       string    // choice_3
+	Reference     string    // reference
+	QuestionType  int16     // question_type
+	CategoryID    int       // category_id
+	QuestionImg   string    // question_img
+	RespondentID  int       // respondent_id
+	RespondentImg string    // respondent_img
+	Sequence      int       // sequence
+	Mytext        string    // mytext
+	Spend         int16     // spend
+	Mychoice      int16     // mychoice
+	Count         int       // count
+	Explanation   string    // explanation
+	CreatedAt     time.Time // created_at
+	EtoColor      string    // not in table
 }
 
 type MCategoryName struct {
@@ -109,6 +111,8 @@ type TQuestion struct {
 	PreviousQuestion int       // previous_question
 	NextQuestion     int       // next_question
 	Sequence         int       // sequence
+	Sound            string    // sound
+	Explanation      string    // explanation
 }
 
 type TUsr struct {

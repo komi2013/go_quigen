@@ -2,31 +2,33 @@ package main
 
 // HAnswer represents public.h_answer
 type HAnswer struct {
-	QuestionID       int       // question_id
-	QuestionTxt      string    // question_txt
-	UsrID            int       // usr_id
-	UsrImg           string    // usr_img
-	CreatedAt        time.Time // created_at
-	UpdatedAt        time.Time // updated_at
-	Choice0          string    // choice_0
-	Choice1          string    // choice_1
-	Choice2          string    // choice_2
-	Choice3          string    // choice_3
-	Reference        string    // reference
-	QuestionType     int16     // question_type
-	CategoryID       int       // category_id
-	QuestionImg      string    // question_img
-	PreviousQuestion int       // previous_question
-	NextQuestion     int       // next_question
-	Sequence         int       // sequence
-	Mychoice         int16     // mychoice
-	Spend            int16     // spend
+	QuestionID    int       // question_id
+	QuestionTxt   string    // question_txt
+	GeneratorID   int       // generator_id
+	GeneratorImg  string    // generator_img
+	CreatedAt     time.Time // created_at
+	Choice0       string    // choice_0
+	Choice1       string    // choice_1
+	Choice2       string    // choice_2
+	Choice3       string    // choice_3
+	Reference     string    // reference
+	QuestionType  int16     // question_type
+	CategoryID    int       // category_id
+	QuestionImg   string    // question_img
+	RespondentID  int       // respondent_id
+	RespondentImg string    // respondent_img
+	Sequence      int       // sequence
+	Mytext        string    // mytext
+	Spend         int16     // spend
+	Mychoice      int16     // mychoice
+	Count         int       // count
+	Explanation   string    // explanation
 }
 // Create inserts the HAnswer to the database.
 func (r *HAnswer) Create(db Queryer) error {
 	_, err := db.Exec(
-		`INSERT INTO h_answer (question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, mychoice, spend) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
-		&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Mychoice, &r.Spend)
+		`INSERT INTO h_answer (question_id, question_txt, generator_id, generator_img, created_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, respondent_id, respondent_img, sequence, mytext, spend, mychoice, count, explanation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
+		&r.QuestionID, &r.QuestionTxt, &r.GeneratorID, &r.GeneratorImg, &r.CreatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.RespondentID, &r.RespondentImg, &r.Sequence, &r.Mytext, &r.Spend, &r.Mychoice, &r.Count, &r.Explanation)
 	if err != nil {
 		return errors.Wrap(err, "failed to insert h_answer")
 	}
@@ -37,8 +39,8 @@ func (r *HAnswer) Create(db Queryer) error {
 func GetHAnswerByPk(db Queryer) (*HAnswer, error) {
 	var r HAnswer
 	err := db.QueryRow(
-		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, mychoice, spend FROM h_answer WHERE `,
-	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Mychoice, &r.Spend)
+		`SELECT question_id, question_txt, generator_id, generator_img, created_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, respondent_id, respondent_img, sequence, mytext, spend, mychoice, count, explanation FROM h_answer WHERE `,
+	).Scan(&r.QuestionID, &r.QuestionTxt, &r.GeneratorID, &r.GeneratorImg, &r.CreatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.RespondentID, &r.RespondentImg, &r.Sequence, &r.Mytext, &r.Spend, &r.Mychoice, &r.Count, &r.Explanation)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select h_answer")
 	}
@@ -245,12 +247,14 @@ type TQuestion struct {
 	PreviousQuestion int       // previous_question
 	NextQuestion     int       // next_question
 	Sequence         int       // sequence
+	Sound            string    // sound
+	Explanation      string    // explanation
 }
 // Create inserts the TQuestion to the database.
 func (r *TQuestion) Create(db Queryer) error {
 	_, err := db.Exec(
-		`INSERT INTO t_question (question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
-		&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence)
+		`INSERT INTO t_question (question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, sound, explanation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+		&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation)
 	if err != nil {
 		return errors.Wrap(err, "failed to insert t_question")
 	}
@@ -261,8 +265,8 @@ func (r *TQuestion) Create(db Queryer) error {
 func GetTQuestionByPk(db Queryer) (*TQuestion, error) {
 	var r TQuestion
 	err := db.QueryRow(
-		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence FROM t_question WHERE `,
-	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence)
+		`SELECT question_id, question_txt, usr_id, usr_img, created_at, updated_at, choice_0, choice_1, choice_2, choice_3, reference, question_type, category_id, question_img, previous_question, next_question, sequence, sound, explanation FROM t_question WHERE `,
+	).Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.CreatedAt, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select t_question")
 	}

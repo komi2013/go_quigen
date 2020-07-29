@@ -14,7 +14,6 @@ import (
 func Generate(w http.ResponseWriter, r *http.Request) {
 
 
-    
     m := map[string]string{
         "cache_v": common.CACHE_V,
         "csrf": common.MakeCSRF(w,r),

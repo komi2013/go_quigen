@@ -9,6 +9,8 @@ import (
 func Eto (usr_id int) [2]string {
   if usr_id < 0 {
     usr_id = usr_id * -1
+  } else if usr_id == 0 {
+    usr_id = 87654321;
   }
   color_id := usr_id * 87654321  // it must be more than 6 digit (16 hex)
   color := fmt.Sprintf("%x", color_id) //16 hexadecimal
