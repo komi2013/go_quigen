@@ -219,16 +219,17 @@ var app = new Vue({
   methods: {
     choose: function (choiced) {
       this.$set(this.choices[choiced],[2],'background-color: grey;');
+      var correct = 0;
+      if(app.choices[choiced][0] == 0){
+        correct = 1;
+      }
       setTimeout(function(){
         for(var i = 0; i < app.choices.length; i++){
           if(app.choices[i][0] == 0){
             app.choices[i][2] = 'background-color: lime;';
           }
         }
-        var correct = 0;
-        if(app.choices[choiced][0] == 0){
-          correct = 1;
-        } else {
+        if(correct == 0){
           app.choices[choiced][2] = 'background-color: red;';
         }
         UIeffect(correct);
@@ -336,8 +337,8 @@ function posting(mychoice){
     ,question_txt  : $('#question_txt').html()
     ,generator_id  : '{{.Q.UsrID}}'
     ,generator_img : '{{.Q.UsrImg}}'
-    ,asked_at      : '{{.Q.UpdatedAt}}'
-    ,preChoices    : app.preChoices
+    ,asked_at      : '{{.UpdatedAt}}'
+    ,preChoices    : JSON.stringify(app.preChoices)
     ,reference     : $('#reference').html()
     ,question_type : '{{.Q.QuestionType}}'
     ,category_id   : '{{.Q.CategoryID}}'
@@ -350,7 +351,7 @@ function posting(mychoice){
     ,mychoice      : mychoice
     ,explanation   : $('#explanation').html()
   };
-  $.post('/answer/',param,function(){},"json")
+  $.post('/Answer/',param,function(){},"json")
   .always(function(res){});
 
 }

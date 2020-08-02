@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
 	"net/http"
 	"log"
@@ -39,18 +39,14 @@ func CheckCSRF(r *http.Request, txt string) bool {
         value = cookie.Value
 	}
 	xr := Decrypt(CSRF_KEY,value)
-	fmt.Printf("%v\n", xr)
+
 	csrf, _ := time.Parse("2006-01-02 15:04:05", xr)
 	t_add := csrf.Add(2 * time.Hour)
-	fmt.Println(t_add)
-	fmt.Println(t_add.After(time.Now()))
 
 	cookie, err = r.Cookie("csrf")
     if err == nil {
         value = cookie.Value
 	}
-	fmt.Println(txt)
-	fmt.Println(value)
 
 	if txt != value || time.Now().After(t_add) {
 		 log.Print("CSRF Panic")

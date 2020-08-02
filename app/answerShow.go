@@ -22,7 +22,7 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-    rows, err := db.Query("SELECT choice_0, created_at, respondent_id, respondent_img, mytext, mychoice, count FROM h_answer WHERE question_id = $1", r.FormValue("q"))
+    rows, err := db.Query("SELECT choice_0, created_at, respondent_id, respondent_img, mytext, mychoice FROM h_answer WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
         panic(err)
     }
@@ -31,7 +31,7 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     var correctNum float64 = 0
     for rows.Next() {
         r := common.HAnswer{}
-        if err := rows.Scan(&r.Choice0, &r.CreatedAt, &r.RespondentID, &r.RespondentImg, &r.Mytext, &r.Mychoice, &r.Count); err != nil {
+        if err := rows.Scan(&r.Choice0, &r.CreatedAt, &r.RespondentID, &r.RespondentImg, &r.Mytext, &r.Mychoice); err != nil {
             log.Fatal(err)
         }
         answer = append(answer,r)

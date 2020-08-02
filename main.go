@@ -11,6 +11,7 @@ import (
 
 func main() {
     http.HandleFunc("/advertisement/", app.Advertisement)
+    http.HandleFunc("/Answer/", app.Answer)
     http.HandleFunc("/AnswerShow/", app.AnswerShow)
     http.HandleFunc("/CommentAdd/", app.CommentAdd)
     http.HandleFunc("/generate/", app.Generate)
@@ -20,6 +21,6 @@ func main() {
     http.HandleFunc("/htm/", app.Htm)
     http.HandleFunc("/quiz/", app.Quiz)
     
-    fmt.Println("浄化")
+    fmt.Println("starting..")
     log.Fatal(http.ListenAndServe(":9001", nil))
 }

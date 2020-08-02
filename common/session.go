@@ -1,13 +1,7 @@
 package common
 
 import (
-	// "github.com/garyburd/redigo/redis"
-	// "crypto/aes"
-	// "crypto/cipher"
-	// "crypto/rand"
-	// "encoding/hex"
-	// "os"
-	"fmt"
+	// "fmt"
 	"time"
 	"strconv"
 	"net/http"
@@ -15,40 +9,28 @@ import (
 )
 
 func SetUser(w http.ResponseWriter, r *http.Request, id int) {
-    // fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-    // fmt.Println("YYYY-MM-DD hh:mm:ss : ", time.Now().Format("2006-01-02 15:04:05"))
-    // old, _ := time.Parse("2006-01-02 15:04:05", "2016-01-02 15:04:05")
-    // fmt.Println(old.Format("2006-01-02 15:04:05"))
-    // now := time.Now()
-    // if old.Equal(now) || old.Before(now) {  // old <= now 
-    //     fmt.Println("old <= now")
-    // }
-	// ss := strconv.Itoa(id) + "_" + time.Now().Format("2006-01-02 15:04:05")
 	txt := strconv.Itoa(id)
-	fmt.Println(txt)
-	txt = Encrypt("6368616e676520746869732070617373",txt)
-	fmt.Println(txt)
+	txt = Encrypt(SESSION_KEY,txt)
     cookie := &http.Cookie{
         Name: "ss",
 		Value: txt,
 		MaxAge: 101556952,
 		Secure: true,
 		HttpOnly: true,
+		Path: "/",
 	}
 	http.SetCookie(w, cookie)
 	txt = time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println(txt)
-	txt = Encrypt("6368616e676520746869732070617373",txt)
-	fmt.Println(txt)
+	txt = Encrypt(SESSION_KEY,txt)
     cookie1 := &http.Cookie{
         Name: "ti",
 		Value: txt,
 		MaxAge: 101556952,
 		Secure: true,
 		HttpOnly: true,
+		Path: "/",
     }
     http.SetCookie(w, cookie1)
-    // fmt.Fprintf(w, "Cookieの設定ができたよ")
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) int {
@@ -56,22 +38,37 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
     cookie, err := r.Cookie("ss")
     if err != nil {
 		log.Print("No Cookie: ", err)
+		return 0
 	}
-	ss := Decrypt("6368616e676520746869732070617373",cookie.Value)
-	fmt.Printf("%v\n", ss)
+	ss := Decrypt(SESSION_KEY,cookie.Value)
+
 	delete := false
 	if ss == "" {
 		log.Print("ss is wrong: ", err)
 		delete = true
 	}
+	usr_id, err = strconv.Atoi(ss)
+	if err != nil {
+		log.Print("ss error: ", err)
+	}
     cookie, err = r.Cookie("ti")
     if err != nil {
 		log.Print("No Cookie: ", err)
 	}
-	t1 := Decrypt("6368616e676520746869732070617373",cookie.Value)
-	fmt.Printf("%v\n", t1)
+	t1 := Decrypt(SESSION_KEY,cookie.Value)
+
 	if t1 == "" {
 		log.Print("t1 is wrong: ", err)
+		delete = true
+	}
+	stampTime, err := time.Parse("2006-01-02 15:04:05", t1)
+	
+	if err != nil {
+		log.Print("time.Parse error: ", err)
+	}
+	t1_add := stampTime.AddDate(1,0,0)
+	if time.Now().After(t1_add) {
+		log.Print("session expired")
 		delete = true
 	}
 	if delete {
@@ -81,6 +78,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 			MaxAge: 0,
 			Secure: true,
 			HttpOnly: true,
+			Path: "/",
 		}
 		http.SetCookie(w, cookie)
 		cookie1 := &http.Cookie{
@@ -89,33 +87,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 			MaxAge: 0,
 			Secure: true,
 			HttpOnly: true,
+			Path: "/",
 		}
 		http.SetCookie(w, cookie1)
+		return 0
 	}
 	return usr_id
 }
-
-
-// func redis_set(key string, value string, c redis.Conn){
-//     c.Do("SET", key, value)
-//   }
-  
-//   func redis_get(key string, c redis.Conn) string{
-//     s, err := redis.String(c.Do("GET", key))
-//     if err != nil {
-//       fmt.Println(err)
-//       os.Exit(1)
-//     }
-//     return s
-//   }
-  
-//   func redis_connection() redis.Conn {
-//     const IP_PORT = "127.0.0.1:6379"
-  
-//     //redisに接続
-//     c, err := redis.Dial("tcp", IP_PORT)
-//     if err != nil {
-//       panic(err)
-//     }
-//     return c
-//   }
