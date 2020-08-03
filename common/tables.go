@@ -22,7 +22,6 @@ type HAnswer struct {
 	RespondentImg string    // respondent_img
 	Sequence      int       // sequence
 	Mytext        string    // mytext
-	Spend         int16     // spend
 	Mychoice      int16     // mychoice
 	Count         int       // count
 	Explanation   string    // explanation

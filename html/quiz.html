@@ -159,7 +159,7 @@
 <div style="padding: 5px 5px 20px 5px;" id="explanation">{{.Q.Explanation}}</div>
 <textarea placeholder="comment" style="width:92%;margin: 2px;" v-model="commentTxt"></textarea>
 <div style="width:100%;text-align:right;">
-  <img src="/img/icon/upload_0.png" alt="comment" class="icon" v-if="!commented" @click="commenting">
+  <img src="/img/icon/upload_0.png" alt="comment" class="icon" v-if="!commented && commentTxt" @click="commenting">
   <img src="/img/icon/success.png" alt="success" class="icon" v-if="commented">
 </div>
 <table>
@@ -190,10 +190,37 @@
 
 <script>
 
-var second_stamp = Math.floor(new Date().getTime() /1000);
 var csrf = '{{.CSRF}}';
 var q_id = '{{.Q.QuestionID}}';
 var u_id = 0;
+localStorage.myphoto = '';
+localStorage.etoColor = '';
+
+function shuffle(array) {
+  var m = array.length, t, i;
+  while (m) {
+    i = Math.floor(Math.random() * m--);
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+  return array;
+}
+var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
+var qi = -1;
+for(var i = 0; i < localQ.length; i++){
+  if(localQ[i][0] == q_id){
+    qi = i;
+  }
+}
+
+function chgQtype(qType) {
+  localStorage.qType = qType;
+  setTimeout(function(){
+    location.href = "" ;
+    return;
+  },100);
+}
 
 var app = new Vue({
   el: '#app',
@@ -272,36 +299,41 @@ var app = new Vue({
   }
 });
 
-function shuffle(array) {
-  var m = array.length, t, i;
-  while (m) {
-    i = Math.floor(Math.random() * m--);
-    t = array[m];
-    array[m] = array[i];
-    array[i] = t;
-  }
-  return array;
+function answerShow(){
+  var param = {
+    csrf : csrf,
+    q : q_id
+  };
+  $.get('/AnswerShow/',param,function(){},"json")
+  .always(function(res){
+    if(res['Status']==1){
+      app.CorrectUsr = res['CorrectUsr'];
+      app.IncorrectUsr = res['IncorrectUsr'];
+      app.AnswerCalc = res['AnswerCalc'];
+      app.Comment = res['Comment'];
+    }else{
+      console.log(res);
+    }
+  });
 }
-localStorage.last_q = q_id;
-        
-var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
-var qi = -1;
-for(var i = 0; i < localQ.length; i++){
-  if(localQ[i][0] == q_id){
-    qi = i;
-  }
-}
+answerShow();
 
 var audio_correct = document.getElementById("audio_correct");
 var audio_incorrect = document.getElementById("audio_incorrect");
 function UIeffect(correct){
+  
+  var correctAmount = app.AnswerCalc[0] * app.AnswerCalc[1] / 100;
+  app.AnswerCalc[1]++;
   if(correct == 1){
     app.circle = true;
     audio_correct.play();
+    app.CorrectUsr.unshift([localStorage.myphoto,localStorage.etoColor]);
+    correctAmount++;
   }else{
     app.cross = true;
     audio_incorrect.play();
   }
+  app.AnswerCalc[0] = Math.round(correctAmount / app.AnswerCalc[1] * 100);
 }
 function saveLocal(correct){
   var arrQ = [
@@ -324,10 +356,16 @@ function saveLocal(correct){
     localQ.splice(-diff, diff);
   }
   localStorage.q = JSON.stringify(localQ);
-  var spent = Math.floor(new Date().getTime() /1000) - second_stamp;
   var daily = localStorage.daily ? JSON.parse(localStorage.daily) : {};
   var today = new Date().getFullYear() + '-' + (new Date().getMonth()+1) + '-' + new Date().getDate()
-  daily[today] = daily[today] ? daily[today] + spent : spent ;
+  if(daily[today][1]){
+    daily[today][1]++;
+    if(correct == 1){
+      daily[today][0]++;
+    }
+  }else{
+    daily[today] = [correct,1];
+  }
   localStorage.daily = JSON.stringify(daily);
 }
 function posting(mychoice){
@@ -347,341 +385,12 @@ function posting(mychoice){
     ,respondent_img: myphoto
     ,sequence      : '{{.Q.Sequence}}'
     ,mytext        : app.choiceTxt
-    ,spend         : Math.floor(new Date().getTime() /1000) - second_stamp
     ,mychoice      : mychoice
     ,explanation   : $('#explanation').html()
   };
   $.post('/Answer/',param,function(){},"json")
   .always(function(res){});
 
-}
-
-// $('.choice').click(function(){
-//   // if(clicked == 2){
-//   //   return;
-//   // }
-//   // clicked = 2;
-//   $(this).css({ 'background-color' : 'grey' });
-
-//   var this_seq = click_ele == '#descriptive' ? $('#txt_answer') : $(this);
-
-//   setTimeout(function(){
-//     answer_1(this_seq);
-//   },1000);
-//   answer_day();
-// });
-var last_answer_stamp = Math.floor(new Date().getTime() /1000);
-function answer_day(){
-  var answer_stamp = Math.floor(new Date().getTime() /1000);
-  var day_stamp = Math.round(answer_stamp /60 /60 /24);
-  var day_sum = {};
-  var arr_stamp = [0,0];
-  if(localStorage.day_sum){
-    day_sum = JSON.parse(localStorage.day_sum);
-    if(day_sum[day_stamp]){
-      arr_stamp = day_sum[day_stamp];
-    }
-  }
-  arr_stamp[0] = arr_stamp[0] + 1;
-  arr_stamp[1] = arr_stamp[1] + answer_stamp - last_answer_stamp;
-  day_sum[day_stamp] = arr_stamp;
-  localStorage.day_sum = JSON.stringify(day_sum);
-}
-
-function answer_1(this_seq){
-  var ans_photo = myphoto ? myphoto : '/img/icon/guest.png';
-  if($('#correct').html() == $(this_seq).html() || 
-          ($('#correct').text() == $(this_seq).text() && $('#correct').text())){
-    var correct_answer = 1;
-    resCo.unshift([0,'',ans_photo,'',mybgcolor]);
-    amt_co++;
-    $('#big_correct').css({'display': ''});
-    $(this_seq).css({'background-color': 'lime'});
-    audio_correct.play();
-  }else{
-    var correct_answer = 0; 
-    resInco.unshift([0,'',ans_photo,'',mybgcolor]);
-    $('#big_incorrect').css({'display': ''});
-    $(this_seq).css({'background-color': 'red'});
-    if(click_ele === '#descriptive'){
-      $('#correct').css({
-        'display': '',
-        'background-color': 'lime'
-      });
-    }
-    audio_incorrect.play();
-  }
-
-  $(this_seq).css({
-    'border-width': '1px 1px',
-    'border-color': 'silver',
-    'border-style': 'solid'
-  });
-  $('.cho_pic').css({ 'opacity': '0.3' });
-  $('.choice').each(function(i){
-    if($('#correct').html() == $('#choice_'+i).html()){
-      $('#choice_'+i).css({
-          'background-color':'lime',
-          'opacity':'1'
-      });
-    }
-  });
-
-  if(correct_answer == 1){
-    addCel(resCo,'co');
-  }else{
-    addCel(resInco,'inco');
-  }
-  var tag = [];
-  $('#tag a').each(function(i){
-    tag[i] = $(this).html();
-    localStorage.last_tag = $(this).html();
-  });
-  var q_img = ($('#photo').attr('src'))? $('#photo').attr('src') : '' ;
-  var myphoto_ans = localStorage.myphoto ? localStorage.myphoto : '';
-  var myname_ans = localStorage.myname ? localStorage.myname : '';
-  var param = {
-    csrf : csrf
-    ,correct : correct_answer
-    ,question : q_id
-    ,q_txt : $('#question').html()
-    ,q_img : q_img
-    ,generator : usr
-    ,arr_tag : tag
-    ,u_img : myphoto_ans
-    ,u_name : myname_ans
-    ,choice_0 : $('#choice_0').text() || $('#choice_0 img').attr('src')
-    ,choice_1 : $('#choice_1').text() || $('#choice_1 img').attr('src')
-    ,choice_2 : $('#choice_2').text() || $('#choice_2 img').attr('src')
-    ,choice_3 : $('#choice_3').text() || $('#choice_3 img').attr('src')
-    ,comment : comment_offline
-    ,myanswer : $(this_seq).text() || $(this_seq).children('img').attr('src')
-    ,correct_choice : $('#correct').text() || $('#correct img').attr('src')
-    ,quiz_num : quiz_num
-  };
-  var arr = [
-      $('#question').html()
-      ,$('#choice_0').text() || $('#choice_0 img').attr('src')
-      ,$('#choice_1').text() || $('#choice_1 img').attr('src')
-      ,$('#choice_2').text() || $('#choice_2 img').attr('src')
-      ,$('#choice_3').text() || $('#choice_3 img').attr('src')
-      ,$('#correct').text() || $('#correct img').attr('src')
-      ,q_img
-      ,q_id
-      ,comment_offline
-      ,$(this_seq).text() || $(this_seq).children('img').attr('src')
-      ,quiz_num
-    ];
-  if(already < 1){
-    $.post('/answer/',param,function(){},"json")
-    .always(function(res){
-      if(res[0]==1){
-      }else{
-      }
-    });
-    offline_q.unshift(arr);
-    if(offline_q.length > 199){
-      var diff = offline_q.length - 200;
-      offline_q.splice(-diff, diff);
-    }
-  }else{
-    for(var i = 0; i < offline_q.length; i++){
-      if(offline_q[i][7] == q_id){
-        offline_q[i] = arr;
-      }
-    }
-  }
-  localStorage.offline_q = JSON.stringify(offline_q);
-  amt_answer++;  
-  after_post(correct_answer);
-}
-function after_post(correct_answer){
-  $('#num_ratio').empty().append(Math.round(amt_co/amt_answer * 100)+' %');
-  $('#num_answer').empty().append(amt_answer);
-  if(localStorage.answer_by_u){
-    var answer_by_u = JSON.parse(localStorage.answer_by_u);
-    answer_by_u = [(answer_by_u[0] + correct_answer),(answer_by_u[1] + 1)];
-  }else{
-    var answer_by_u = [correct_answer, 1];
-  }
-  localStorage.answer_by_u = JSON.stringify(answer_by_u);
-  if(answer_by_u[1] > 9){
-    var u_answer = answer_by_u[1] / 10;
-    u_answer = Math.floor(u_answer) * 10;
-  }else{
-    var u_answer = answer_by_u[1];
-  }
-  localStorage.session_answer = localStorage.session_answer*1 + 1;
-
-  var hour_stamp = Math.floor(new Date().getTime() /1000 /60 /60); 
-  var notify = JSON.parse(localStorage.notify);
-  notify[1] = hour_stamp+1;
-  localStorage.notify = JSON.stringify(notify);
-  ticket[0]--;
-  localStorage.ticket = JSON.stringify(ticket);
-  setTimeout(function(){
-    if(next_q){
-      if(iframe){
-        top.window.location.href = 'https://'+domain+'/quiz/?q='+next_q;        
-      }else{
-        location.href = '/quiz/?q='+next_q;
-      }
-    }else{
-      location.href = '/';
-    }
-  },1000);
-}
-
-function answerShow(){
-  var param = {
-    csrf : csrf,
-    q : q_id
-  };
-  $.get('/AnswerShow/',param,function(){},"json")
-  .always(function(res){
-    if(res['Status']==1){
-      app.CorrectUsr = res['CorrectUsr'];
-      app.IncorrectUsr = res['IncorrectUsr'];
-      app.AnswerCalc = res['AnswerCalc'];
-      app.Comment = res['Comment'];
-    }else{
-      console.log(res);
-    }
-  });
-}
-answerShow();
-var amt_co = 0;
-var amt_answer = 0;
-function answer_by_q_show(){
-  var param = {
-    q : q_id
-  };
-  $.get('/answerbyqshow/',param,function(){},"json")
-  .always(function(res){
-    if(res[0]==1){
-      amt_co = res[1][0];
-      amt_answer = res[1][1];
-      if(amt_co == 0){
-        $('#num_ratio').empty().append(0+' %');
-      }else{
-        $('#num_ratio').empty().append(Math.round(amt_co/amt_answer * 100)+' %');
-      }
-      $('#num_answer').empty().append(amt_answer);
-      
-    }else{
-     console.log(res);
-    }
-  });
-}
-var next_q = 0;
-var quiz_num = 0;
-function tag_show(){
-  var param = {
-    q : q_id
-  };
-  $.get('/tagshow/',param,function(){},"json")
-  .always(function(res){
-    if(res[0]==1){
-      for(i = 0; i < res[1].length; i++){
-        $('#tag').append('&nbsp;<a href="/search/?tag='+res[1][i]['txt']+'">#'+res[1][i]['txt']+'</a>&nbsp;');
-
-      }
-      $('#question').prepend(no_+res[1][0]['quiz_num']+mon+' ');
-      quiz_num = res[1][0]['quiz_num'];
-      if(res[3] && res[3][0]){
-        next_q = res[3][0];
-      }
-      addNavi(res,3);
-      addNavi(res,2);
-    }else{
-     //console.log(res);
-    }
-  });
-}
-function addNavi(res,nextPrev) {
-  if(!res[nextPrev] || !res[nextPrev][0]){
-    return;
-  }
-  var append = '';
-  if(res[nextPrev][2]){
-    append = 
-    '<tr><td colspan="15" class="td_15_t">'+
-    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
-    '<img src="'+res[nextPrev][2]+'" alt="quiz" class="icon"></a>'+
-    '</td><td colspan="85" class="td_84_t">'+
-    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
-    no_+res[nextPrev][3]+mon+decodeURIComponent(res[nextPrev][1])+
-    '</a>'+
-    '</td>'+
-    '</tr>';
-  }else{
-    append = 
-    '<tr><td colspan="100" class="td_84_t">'+
-    '<a href="/quiz/?q='+res[nextPrev][0]+'">'+
-    no_+res[nextPrev][3]+mon+decodeURIComponent(res[nextPrev][1])+
-    '</a>'+
-    '</td>'+
-    '</tr>';
-  }
-  $('#next_prev').append(append);
-}
-$('#comment_add').click(function(){
-  if(!localStorage.login){
-    alert(please_login);
-    return;
-  }
-  var validate = 1;
-  if($('#comment_data').val().length < 10){
-    alert('you must input more');
-    $('#comment_data').css({'border-color':'red'});
-    validate=2;
-  }
-  if(validate==2){
-    return false;
-  }
-  if(localStorage.quest){
-    var quest = JSON.parse(localStorage.quest);
-    if(quest[6] != 1){
-      quest[6] = 1;
-      localStorage.quest = JSON.stringify(quest);
-      notify[2] = 'yet';
-      notify[3] = 1;
-      notify[4] = notify[4]+1;
-      var news = localStorage.news ? JSON.parse(localStorage.news) : [];
-      news.unshift('<a href="/htm/quest/">'+commented+'<img src="/img/icon/star_1.png"></a>');
-      localStorage.news = JSON.stringify(news);
-      localStorage.notify = JSON.stringify(notify);
-    }
-  }
-  $('#comment_add').css({'display': 'none'});
-  $('#success').css({'display':''});
-  var myphoto = localStorage.myphoto ? localStorage.myphoto : '';
-  var myname = localStorage.myname ? localStorage.myname : '';
-  var param = {
-    csrf : csrf
-    ,txt : $('#comment_data').val()
-    ,q : q_id
-    ,u_img : myphoto
-    ,u_name : myname
-  };
-  $.post('/commentadd/',param,function(){},"json")
-  .always(function(res){
-    if(res[0]==1){
-      location.reload();
-    }else{
-      alert('connection error');
-    }
-  });
-
-  return false;
-});
-
-function chgQtype(qType) {
-  localStorage.qType = qType;
-  setTimeout(function(){
-    location.href = "" ;
-    return;
-  },100);
 }
 
 if(app.sound){

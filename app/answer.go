@@ -71,11 +71,10 @@ func Answer(w http.ResponseWriter, r *http.Request) {
         ,respondent_img
         ,sequence      
         ,mytext        
-        ,spend         
         ,mychoice      
         ,explanation
         ,created_at
-        ) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`, 
+        ) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`, 
         r.FormValue("question_id"),
         r.FormValue("question_txt"),
         r.FormValue("generator_id"),
@@ -93,7 +92,6 @@ func Answer(w http.ResponseWriter, r *http.Request) {
         r.FormValue("respondent_img"),
         r.FormValue("sequence"),
         r.FormValue("mytext"),
-        r.FormValue("spend"),
         r.FormValue("mychoice"),
         r.FormValue("explanation"),
         time.Now().Format("2006-01-02 15:04:05"))

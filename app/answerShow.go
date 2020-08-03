@@ -47,7 +47,6 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
         answerCalc[1] = count
     }
     
-    // fmt.Printf("%#v\n", answerCalc)
     sort.Slice(answer, func(i, j int) bool { return answer[i].CreatedAt.After(answer[j].CreatedAt) }) // DESC
 
     var correctUsr [16][2]string
@@ -117,5 +116,3 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     // fmt.Printf("%#v\n", res)
     fmt.Fprint(w, string(res))
 }
-
-// func Slice(slice interface{}, less func(i, j int) bool)
