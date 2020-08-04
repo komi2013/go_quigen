@@ -37,7 +37,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 	usr_id := 0
     cookie, err := r.Cookie("ss")
     if err != nil {
-		log.Print("No Cookie: ", err)
+		log.Print("No ss Cookie: ", err)
 		return 0
 	}
 	ss := Decrypt(SESSION_KEY,cookie.Value)
@@ -53,12 +53,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 	}
     cookie, err = r.Cookie("ti")
     if err != nil {
-		log.Print("No Cookie: ", err)
+		log.Print("No ti Cookie: ", err)
 	}
 	t1 := Decrypt(SESSION_KEY,cookie.Value)
 
 	if t1 == "" {
-		log.Print("t1 is wrong: ", err)
+		log.Print("ti is wrong: ", err)
 		delete = true
 	}
 	stampTime, err := time.Parse("2006-01-02 15:04:05", t1)

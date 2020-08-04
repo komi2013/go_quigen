@@ -20,11 +20,11 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     }
 	db, err := sql.Open("postgres", common.DB_CONNECT)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
     rows, err := db.Query("SELECT choice_0, created_at, respondent_id, respondent_img, mytext, mychoice FROM h_answer WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     var answer []common.HAnswer
     var count float64 = 0
@@ -32,7 +32,7 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     for rows.Next() {
         r := common.HAnswer{}
         if err := rows.Scan(&r.Choice0, &r.CreatedAt, &r.RespondentID, &r.RespondentImg, &r.Mytext, &r.Mychoice); err != nil {
-            log.Fatal(err)
+            log.Print(err)
         }
         answer = append(answer,r)
         if r.Choice0 == r.Mytext || r.Mychoice == 0 {
@@ -73,13 +73,13 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
 
     rows, err = db.Query("SELECT comment_txt,usr_id,question_id,usr_img,created_at FROM t_comment WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     var comment []common.TComment
     for rows.Next() {
         r := common.TComment{}
         if err := rows.Scan(&r.CommentTxt, &r.UsrID, &r.QuestionID, &r.UsrImg, &r.CreatedAt); err != nil {
-            log.Fatal(err)
+            log.Print(err)
         }
         if r.UsrImg == "" {
             eto := common.Eto(r.UsrID)

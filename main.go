@@ -16,8 +16,6 @@ func main() {
     http.HandleFunc("/CommentAdd/", app.CommentAdd)
     http.HandleFunc("/generate/", app.Generate)
     http.HandleFunc("/GenerateQuiz/", app.GenerateQuiz)
-    http.HandleFunc("/crypttry/", app.CryptTry)
-    http.HandleFunc("/SqlTest", app.SqlTest)
     http.HandleFunc("/htm/", app.Htm)
     http.HandleFunc("/quiz/", app.Quiz)
     

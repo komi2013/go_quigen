@@ -25,13 +25,13 @@ func Answer(w http.ResponseWriter, r *http.Request) {
 	connStr := common.DB_CONNECT
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
     }
     u_id := common.GetUser(w,r)
     if (u_id == 0) {
         rows, err := db.Query("SELECT NEXTVAL('nologin_usr_id_seq')")
         if err != nil {
-            log.Fatal(err)
+            log.Print(err)
         }
         type Nextval struct {
             Int        int
@@ -40,7 +40,7 @@ func Answer(w http.ResponseWriter, r *http.Request) {
         for rows.Next() {
             n := Nextval{}
             if err := rows.Scan(&n.Int); err != nil {
-                log.Fatal(err)
+                log.Print(err)
             }
             next = append(next,n)
         }
@@ -96,7 +96,7 @@ func Answer(w http.ResponseWriter, r *http.Request) {
         r.FormValue("explanation"),
         time.Now().Format("2006-01-02 15:04:05"))
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     fmt.Fprint(w, `["1"]`)
 

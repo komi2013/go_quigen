@@ -19,6 +19,13 @@
   border-bottom: 1px solid white;
   text-align: left;
 }
+.cho_pic{
+  width: 49%;
+  text-align: center;
+}
+.cho_pic img {
+  max-width: 99%;
+}
 .grey {
   background-color: grey;
 }
@@ -101,11 +108,11 @@
   </div>
   {{if eq .Q.QuestionType 2}}
   <table><tr>
-      <td class="cho_pic" @click="choose(0)"><img src="{{.Q.Choice0}}"></td>
-      <td class="cho_pic" @click="choose(1)"><img src="{{.Q.Choice1}}"></td>
+      <td class="cho_pic" @click="choose(0)" :style="choices[0][2]" ><img :src="choices[0][1]"></td>
+      <td class="cho_pic" @click="choose(1)" :style="choices[1][2]" ><img :src="choices[1][1]"></td>
   </tr><tr>
-      <td class="cho_pic" @click="choose(2)"><img src="{{.Q.Choice2}}"></td>
-      <td class="cho_pic" @click="choose(3)"><img src="{{.Q.Choice3}}"></td>
+      <td class="cho_pic" @click="choose(2)" :style="choices[2][2]" ><img :src="choices[2][1]"></td>
+      <td class="cho_pic" @click="choose(3)" :style="choices[3][2]" ><img :src="choices[3][1]"></td>
   </tr></table>
 
   {{else}}
@@ -358,7 +365,7 @@ function saveLocal(correct){
   localStorage.q = JSON.stringify(localQ);
   var daily = localStorage.daily ? JSON.parse(localStorage.daily) : {};
   var today = new Date().getFullYear() + '-' + (new Date().getMonth()+1) + '-' + new Date().getDate()
-  if(daily[today][1]){
+  if(daily[today] && daily[today][1]){
     daily[today][1]++;
     if(correct == 1){
       daily[today][0]++;

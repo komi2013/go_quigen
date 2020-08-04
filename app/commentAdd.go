@@ -25,7 +25,7 @@ func CommentAdd(w http.ResponseWriter, r *http.Request) {
     }
 	db, err := sql.Open("postgres", common.DB_CONNECT)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
     _, err = db.Exec(`INSERT INTO t_comment(
         comment_txt,usr_id,question_id,created_at,usr_img
@@ -36,7 +36,7 @@ func CommentAdd(w http.ResponseWriter, r *http.Request) {
         time.Now().Format("2006-01-02 15:04:05"),
         r.FormValue("usr_img") )
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     fmt.Fprint(w, `{"Status":"1"}`)
 

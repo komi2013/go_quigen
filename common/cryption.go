@@ -4,7 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	// "fmt"
+	"log"
     "io"
 	"encoding/hex"
 	"encoding/base64"
@@ -16,12 +16,12 @@ func Encrypt(keyStr string, text string) string {
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
@@ -34,7 +34,7 @@ func Decrypt(keyStr string, text string) string{
 	ciphertext, _ := base64.StdEncoding.DecodeString(text)
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	if len(ciphertext) < aes.BlockSize {
 		// panic("ciphertext too short")

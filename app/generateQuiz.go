@@ -26,18 +26,18 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
 	connStr := "user=exam_8099 password=Zk1CGsBK dbname=go_english sslmode=disable port=5432 host=194.135.95.163"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	rows, err := db.Query("SELECT NEXTVAL('t_question_question_id_seq')")
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     var next []common.Table3
     for rows.Next() {
         n := common.Table3{}
         if err := rows.Scan(&n.Int); err != nil {
-            log.Fatal(err)
+            log.Print(err)
         }
         next = append(next,n)
     }
@@ -80,7 +80,7 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
         usr_id,
         r.FormValue("myphoto"))
     if err != nil {
-        panic(err)
+        log.Print(err)
     }
     fmt.Fprint(w, `["1"]`)
 

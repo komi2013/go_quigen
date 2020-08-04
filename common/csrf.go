@@ -49,7 +49,7 @@ func CheckCSRF(r *http.Request, txt string) bool {
 	}
 
 	if txt != value || time.Now().After(t_add) {
-		 log.Print("CSRF Panic")
+		 log.Print("CSRF value different or time expired")
 		 return false
 	}
 	return true
