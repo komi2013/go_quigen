@@ -179,15 +179,16 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span>
   </tr>
 </table>
 
+<div>
+
+
+<a href="">  </a><br>
+
+</div>
+
 </div line="106">
 
-<div>
-{{ range $i,$v := .BreadCrumb }}
 
-<a href="{{$i}}">  {{ range . }} <span> {{.}} </span> {{end}}  </a><br>
-
-{{end}}
-</div>
 
 {{ if .Q.Reference }}
 <div style="word-wrap:break-word;" id="reference">reference: {{.Q.Reference}}</div>
@@ -275,6 +276,7 @@ var app = new Vue({
     Comment: [],
     commentTxt: "",
     commented: false,
+    BreadCrumb: JSON.parse( {{.BreadCrumb}} )
   },
   methods: {
     choose: function (choiced) {
@@ -343,7 +345,7 @@ var app = new Vue({
     },
   },
 });
-
+console.log(app.BreadCrumb["1"]);
 function answerShow(){
   var param = {
     csrf : csrf,

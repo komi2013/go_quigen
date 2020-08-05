@@ -9,6 +9,7 @@ import (
     "../common"
     "fmt"
     "strconv"
+    "encoding/json"
 )
 
 func Quiz(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         Myphoto string
         EtoColor string
         Available int
-        BreadCrumb map[int]map[int]string
+        BreadCrumb string
         // PleaseClick string
     }
     var view View
@@ -69,44 +70,35 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         if err := rows.Scan(&r.LeafID,&r.Level1,&r.Level2,&r.Level3,&r.Level4,&r.Level5,&r.Level6,&r.Level7,&r.Level8,&r.UpdatedAt); err != nil {
             log.Print(err)
         }
-        breadCrumb[r.Level1] = make(map[int]string)
-        breadCrumb[r.Level1][0] = "1"
-        
         whereIn = strconv.Itoa(r.Level1)
+        breadCrumb[r.Level1] = make(map[int]string)
         if(r.Level2 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level2)
             breadCrumb[r.Level2] = make(map[int]string)
-            breadCrumb[r.Level2][0] = "2"
         }
         if(r.Level3 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level3)
             breadCrumb[r.Level3] = make(map[int]string)
-            breadCrumb[r.Level3][0] = "3"
         }
         if(r.Level4 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level4)
             breadCrumb[r.Level4] = make(map[int]string)
-            breadCrumb[r.Level4][0] = "4"
         }
         if(r.Level5 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level5)
             breadCrumb[r.Level5] = make(map[int]string)
-            breadCrumb[r.Level5][0] = "5"
         }
         if(r.Level6 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level6)
             breadCrumb[r.Level6] = make(map[int]string)
-            breadCrumb[r.Level6][0] = "6"
         }
         if(r.Level7 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level7)
             breadCrumb[r.Level7] = make(map[int]string)
-            breadCrumb[r.Level7][0] = "7"
         }
         if(r.Level8 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level8)
             breadCrumb[r.Level8] = make(map[int]string)
-            breadCrumb[r.Level8][0] = "8"
         }
     }
     rows, err = db.Query("SELECT category_id, category_name FROM m_category_name WHERE category_id in ("+whereIn+")")
@@ -119,10 +111,11 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
             log.Print(err)
         }
         // categoryName = append(categoryName, r)
-        breadCrumb[r.CategoryID][1] = r.CategoryName
+        breadCrumb[r.CategoryID][0] = r.CategoryName
     }
-    fmt.Printf("breadCrumb %#v\n", breadCrumb)
-    view.readCrumb = breadCrumb
+    res, _ := json.Marshal(breadCrumb)
+    fmt.Printf("breadCrumb %#v\n", string(res))
+    view.BreadCrumb = string(res)
     tpl := template.Must(template.ParseFiles("html/quiz.html"))
     tpl.Execute(w, view)
 }
