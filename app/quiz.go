@@ -7,9 +7,9 @@ import (
     "log"
     "net/http"
     "../common"
-    "fmt"
+    // "fmt"
     "strconv"
-    "encoding/json"
+    "sort"
 )
 
 func Quiz(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +20,11 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
     u_id := common.GetUser(w,r)
+    type BreadCrumb struct {
+        Level int
+        CategoryID int
+        CategoryName string
+    }
     type View struct {
         CacheV string
         CSRF string
@@ -28,7 +33,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         Myphoto string
         EtoColor string
         Available int
-        BreadCrumb string
+        BreadCrumb []BreadCrumb
         // PleaseClick string
     }
     var view View
@@ -59,7 +64,9 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         question = r
     }
     view.Q = question
-    breadCrumb := make(map[int]map[int]string)
+    convert := make(map[int]string)
+    var tree [][2]int
+    var x [2]int
     rows, err = db.Query("SELECT * FROM m_category_tree WHERE leaf_id = $1", question.CategoryID)
     if err != nil {
         log.Print(err)
@@ -71,34 +78,58 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
             log.Print(err)
         }
         whereIn = strconv.Itoa(r.Level1)
-        breadCrumb[r.Level1] = make(map[int]string)
+        x[0] = 1
+        x[1] = r.Level1
+        tree = append(tree, x)
+        convert[r.Level1] = ""
         if(r.Level2 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level2)
-            breadCrumb[r.Level2] = make(map[int]string)
+            x[0] = 2
+            x[1] = r.Level2
+            tree = append(tree, x)
+            convert[r.Level2] = ""
         }
         if(r.Level3 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level3)
-            breadCrumb[r.Level3] = make(map[int]string)
+            x[0] = 3
+            x[1] = r.Level3
+            tree = append(tree, x)
+            convert[r.Level3] = ""
         }
         if(r.Level4 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level4)
-            breadCrumb[r.Level4] = make(map[int]string)
+            x[0] = 4
+            x[1] = r.Level4
+            tree = append(tree, x)
+            convert[r.Level4] = ""
         }
         if(r.Level5 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level5)
-            breadCrumb[r.Level5] = make(map[int]string)
+            x[0] = 5
+            x[1] = r.Level5
+            tree = append(tree, x)
+            convert[r.Level5] = ""
         }
         if(r.Level6 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level6)
-            breadCrumb[r.Level6] = make(map[int]string)
+            x[0] = 6
+            x[1] = r.Level6
+            tree = append(tree, x)
+            convert[r.Level6] = ""
         }
         if(r.Level7 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level7)
-            breadCrumb[r.Level7] = make(map[int]string)
+            x[0] = 7
+            x[1] = r.Level7
+            tree = append(tree, x)
+            convert[r.Level7] = ""
         }
         if(r.Level8 > 0){
             whereIn = whereIn + "," + strconv.Itoa(r.Level8)
-            breadCrumb[r.Level8] = make(map[int]string)
+            x[0] = 8
+            x[1] = r.Level8
+            tree = append(tree, x)
+            convert[r.Level8] = ""
         }
     }
     rows, err = db.Query("SELECT category_id, category_name FROM m_category_name WHERE category_id in ("+whereIn+")")
@@ -110,12 +141,26 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         if err := rows.Scan(&r.CategoryID,&r.CategoryName); err != nil {
             log.Print(err)
         }
+        convert[r.CategoryID] = r.CategoryName
         // categoryName = append(categoryName, r)
-        breadCrumb[r.CategoryID][0] = r.CategoryName
+        // breadCrumb[r.CategoryID]["name"] = r.CategoryName
     }
-    res, _ := json.Marshal(breadCrumb)
-    fmt.Printf("breadCrumb %#v\n", string(res))
-    view.BreadCrumb = string(res)
+    // fmt.Printf("tree %#v\n", tree)
+    // fmt.Printf("breadCrumb %#v\n", convert)
+    var breadCrumb []BreadCrumb
+    for _, v := range tree {
+        y := BreadCrumb{}
+        y.Level = v[0]
+        y.CategoryID = v[1]
+        y.CategoryName = convert[v[1]]
+        breadCrumb = append(breadCrumb, y)
+        // v.CategoryName = convert[v.CategoryID]
+        // fmt.Printf("convert %#v\n", convert[v[1]])
+    }
+    
+    sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
+    // fmt.Printf("breadCrumb %#v\n", breadCrumb)
+    view.BreadCrumb = breadCrumb
     tpl := template.Must(template.ParseFiles("html/quiz.html"))
     tpl.Execute(w, view)
 }
