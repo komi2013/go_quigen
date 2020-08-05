@@ -7,7 +7,8 @@ import (
     "log"
     "net/http"
     "../common"
-    // "fmt"
+    "fmt"
+    "strconv"
 )
 
 func Quiz(w http.ResponseWriter, r *http.Request) {
@@ -23,27 +24,105 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         CSRF string
         Q common.TQuestion
         UpdatedAt string
-        Uid int
+        Myphoto string
+        EtoColor string
+        Available int
+        BreadCrumb map[int]map[int]string
+        // PleaseClick string
     }
     var view View
     view.CacheV = common.CACHE_V
     view.CSRF = common.MakeCSRF(w,r)
-    view.Uid = u_id
+    // view.PleaseClick = common.PLEASE_CLICK
 
-    rows, err := db.Query("select question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence from t_question WHERE question_id = $1", r.FormValue("q"))
+    eto := common.Eto(u_id)
+    view.Myphoto = eto[0]
+    view.EtoColor = eto[1]
+
+    rows, err := db.Query("SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence,sound,explanation from t_question WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
         log.Print(err)
     }
     var question common.TQuestion
     for rows.Next() {
         r := common.TQuestion{}
-        if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence); err != nil {
+        if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation); err != nil {
             log.Print(err)
         }
         view.UpdatedAt = r.UpdatedAt.Format("2006-01-02 15:04:05")
+        if r.Sound != "" {
+            view.Available = 0
+        }else{
+            view.Available = 1
+        }
         question = r
     }
     view.Q = question
+    breadCrumb := make(map[int]map[int]string)
+    rows, err = db.Query("SELECT * FROM m_category_tree WHERE leaf_id = $1", question.CategoryID)
+    if err != nil {
+        log.Print(err)
+    }
+    var whereIn string
+    for rows.Next() {
+        r := common.MCategoryTree{}
+        if err := rows.Scan(&r.LeafID,&r.Level1,&r.Level2,&r.Level3,&r.Level4,&r.Level5,&r.Level6,&r.Level7,&r.Level8,&r.UpdatedAt); err != nil {
+            log.Print(err)
+        }
+        breadCrumb[r.Level1] = make(map[int]string)
+        breadCrumb[r.Level1][0] = "1"
+        
+        whereIn = strconv.Itoa(r.Level1)
+        if(r.Level2 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level2)
+            breadCrumb[r.Level2] = make(map[int]string)
+            breadCrumb[r.Level2][0] = "2"
+        }
+        if(r.Level3 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level3)
+            breadCrumb[r.Level3] = make(map[int]string)
+            breadCrumb[r.Level3][0] = "3"
+        }
+        if(r.Level4 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level4)
+            breadCrumb[r.Level4] = make(map[int]string)
+            breadCrumb[r.Level4][0] = "4"
+        }
+        if(r.Level5 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level5)
+            breadCrumb[r.Level5] = make(map[int]string)
+            breadCrumb[r.Level5][0] = "5"
+        }
+        if(r.Level6 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level6)
+            breadCrumb[r.Level6] = make(map[int]string)
+            breadCrumb[r.Level6][0] = "6"
+        }
+        if(r.Level7 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level7)
+            breadCrumb[r.Level7] = make(map[int]string)
+            breadCrumb[r.Level7][0] = "7"
+        }
+        if(r.Level8 > 0){
+            whereIn = whereIn + "," + strconv.Itoa(r.Level8)
+            breadCrumb[r.Level8] = make(map[int]string)
+            breadCrumb[r.Level8][0] = "8"
+        }
+    }
+    rows, err = db.Query("SELECT category_id, category_name FROM m_category_name WHERE category_id in ("+whereIn+")")
+    if err != nil {
+        log.Print(err)
+    }
+    for rows.Next() {
+        r := common.MCategoryName{}
+        if err := rows.Scan(&r.CategoryID,&r.CategoryName); err != nil {
+            log.Print(err)
+        }
+        // categoryName = append(categoryName, r)
+        breadCrumb[r.CategoryID][1] = r.CategoryName
+    }
+    fmt.Printf("breadCrumb %#v\n", breadCrumb)
+    view.readCrumb = breadCrumb
     tpl := template.Must(template.ParseFiles("html/quiz.html"))
     tpl.Execute(w, view)
 }

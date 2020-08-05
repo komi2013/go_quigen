@@ -19,7 +19,7 @@
   border-bottom: 1px solid white;
   text-align: left;
 }
-.cho_pic{
+.choicePicture td{
   width: 49%;
   text-align: center;
 }
@@ -84,9 +84,9 @@
 <div id="content">
 
 <div style="position:absolute;top:-10000px;">
-  <!-- if .Q.Sound
-  <audio id="audio" controls><source src=".Q.Sound"></audio>
-  end -->
+  {{ if .Q.Sound }}
+  <audio id="audio" controls><source src="{{.Q.Sound}}"></audio>
+  {{ end }}
   <audio id="audio_correct" controls><source src="/sound/correct.mp3"></audio>
   <audio id="audio_incorrect" controls><source src="/sound/incorrect.mp3"></audio>
 </div>
@@ -99,20 +99,23 @@
   <img src="{{.Q.QuestionImg}}" id="photo">
 </div>
 {{ end }}
-<div style="padding: 5px 5px 20px 5px;"> No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span> </div>
-<div id="app" line=151>
+<div style="padding: 5px 5px 20px 5px;"> 
+No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span> 
+{{ if eq .Available 0 }} <br>タップして音を聞いて下さい<br> {{end}}
+</div>
+<div id="app" :style="soundPlayed" line="182">
 <div style="position: relative;">
   <div style="position: absolute; width:100%; text-align: center;">
   <img src="/img/icon/circle_big.png" class="big_icon" v-if="circle">
   <img src="/img/icon/cross_big.png" class="big_icon" v-if="cross">
   </div>
   {{if eq .Q.QuestionType 2}}
-  <table><tr>
-      <td class="cho_pic" @click="choose(0)" :style="choices[0][2]" ><img :src="choices[0][1]"></td>
-      <td class="cho_pic" @click="choose(1)" :style="choices[1][2]" ><img :src="choices[1][1]"></td>
+  <table class="choicePicture"><tr>
+      <td @click="choose(0)" :style="choices[0][2]" ><img :src="choices[0][1]"></td>
+      <td @click="choose(1)" :style="choices[1][2]" ><img :src="choices[1][1]"></td>
   </tr><tr>
-      <td class="cho_pic" @click="choose(2)" :style="choices[2][2]" ><img :src="choices[2][1]"></td>
-      <td class="cho_pic" @click="choose(3)" :style="choices[3][2]" ><img :src="choices[3][1]"></td>
+      <td @click="choose(2)" :style="choices[2][2]" ><img :src="choices[2][1]"></td>
+      <td @click="choose(3)" :style="choices[3][2]" ><img :src="choices[3][1]"></td>
   </tr></table>
 
   {{else}}
@@ -176,6 +179,14 @@
   </tr>
 </table>
 
+</div line="106">
+
+<div>
+{{ range $i,$v := .BreadCrumb }}
+
+<a href="{{$i}}">  {{ range . }} <span> {{.}} </span> {{end}}  </a><br>
+
+{{end}}
 </div>
 
 {{ if .Q.Reference }}
@@ -199,9 +210,9 @@
 
 var csrf = '{{.CSRF}}';
 var q_id = '{{.Q.QuestionID}}';
-var u_id = 0;
-localStorage.myphoto = '';
-localStorage.etoColor = '';
+var myphoto = localStorage.myphoto ? localStorage.myphoto : '{{.Myphoto}}';
+var etoColor = '{{.EtoColor}}';
+var available = '{{.Available}}';
 
 function shuffle(array) {
   var m = array.length, t, i;
@@ -222,12 +233,28 @@ for(var i = 0; i < localQ.length; i++){
 }
 
 function chgQtype(qType) {
+  if(available < 1){
+    return;
+  }
   localStorage.qType = qType;
   setTimeout(function(){
     location.href = "" ;
     return;
   },100);
 }
+
+if(available < 1){
+  var a = document.getElementById("audio");
+  $('#play').click(function(){
+      if(available < 1){ a.play(); }
+      setTimeout(function(){
+        $('a').css({ 'pointer-events': '' });
+        available = 1;
+      },2000);
+      $('.cho_pic').css({ 'displa': '1' });
+  });
+}
+
 
 var app = new Vue({
   el: '#app',
@@ -248,10 +275,13 @@ var app = new Vue({
     Comment: [],
     commentTxt: "",
     commented: false,
-    sound: null,
   },
   methods: {
     choose: function (choiced) {
+      if(available < 1){
+        return;
+      }
+      available = 0;
       this.$set(this.choices[choiced],[2],'background-color: grey;');
       var correct = 0;
       if(app.choices[choiced][0] == 0){
@@ -274,6 +304,10 @@ var app = new Vue({
       }
     },
     describe: function (e) {
+      if(available < 1){
+        return;
+      }
+      available = 0;
       var correct = 0;
       if(this.choiceTxt == this.preChoices[0]){
         correct = 1;
@@ -287,12 +321,11 @@ var app = new Vue({
       }
     },
     commenting: function (k) {
-      console.log(localStorage.myphoto);
       var param = {
         csrf : csrf,
         comment_txt : this.commentTxt,
         question_id : q_id,
-        usr_img : localStorage.myphoto
+        usr_img : myphoto
       };
       $.post('/CommentAdd/',param,function(){},"json")
       .always(function(res){
@@ -303,7 +336,12 @@ var app = new Vue({
         }
       });
     },
-  }
+  },
+  computed: {
+    soundPlayed() {
+        return 'opacity: '+ available +';';
+    },
+  },
 });
 
 function answerShow(){
@@ -334,11 +372,12 @@ function UIeffect(correct){
   if(correct == 1){
     app.circle = true;
     audio_correct.play();
-    app.CorrectUsr.unshift([localStorage.myphoto,localStorage.etoColor]);
+    app.CorrectUsr.unshift([myphoto,'background-color:#'+etoColor]);
     correctAmount++;
   }else{
     app.cross = true;
     audio_incorrect.play();
+    app.IncorrectUsr.unshift([myphoto,'background-color:#'+etoColor]);
   }
   app.AnswerCalc[0] = Math.round(correctAmount / app.AnswerCalc[1] * 100);
 }
@@ -388,7 +427,6 @@ function posting(mychoice){
     ,question_type : '{{.Q.QuestionType}}'
     ,category_id   : '{{.Q.CategoryID}}'
     ,question_img  : '{{.Q.QuestionImg}}'
-    ,respondent_id : u_id
     ,respondent_img: myphoto
     ,sequence      : '{{.Q.Sequence}}'
     ,mytext        : app.choiceTxt
@@ -397,21 +435,6 @@ function posting(mychoice){
   };
   $.post('/Answer/',param,function(){},"json")
   .always(function(res){});
-
-}
-
-if(app.sound){
-    var a = document.getElementById("audio");
-    var played = 0;
-    $('#play').click(function(){
-        if(played < 1){ a.play(); }
-        setTimeout(function(){
-          $('a').css({ 'pointer-events': '' });
-          clicked = 0;
-          played = 1;
-        },2000);
-        $('.cho_pic').css({ 'opacity': '1' });
-    });
 }
 
 </script>

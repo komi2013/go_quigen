@@ -90,8 +90,6 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     }
 
     sort.Slice(comment, func(i, j int) bool { return comment[i].CreatedAt.After(comment[j].CreatedAt) }) // DESC
-    // sort.Sort(comment)
-    // fmt.Printf("%#v\n", comment)
     type Arr struct {
         Status       int
         CorrectUsr   [16][2]string
@@ -113,6 +111,5 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     arr.AnswerCalc = answerCalc
     arr.Comment = comment
     res, _ := json.Marshal(arr)
-    // fmt.Printf("%#v\n", res)
     fmt.Fprint(w, string(res))
 }

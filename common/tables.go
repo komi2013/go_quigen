@@ -71,18 +71,6 @@ type TComment struct {
 	EtoColor   string     // not in table
 }
 
-type CommentCreatedAt []TComment
-func (p CommentCreatedAt) Len() int {
-    return len(p)
-}
-func (p CommentCreatedAt) Swap(i, j int) {
-    p[i], p[j] = p[j], p[i]
-}
-func (p CommentCreatedAt) Less(i, j int) bool {
-    return p[i].CreatedAt.After(p[j].CreatedAt)
-}
-
-
 type TMessage struct {
 	MessageID  int       // message_id
 	Sender     int       // sender
