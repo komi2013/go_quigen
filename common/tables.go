@@ -37,9 +37,10 @@ type MCategoryName struct {
 }
 
 type MCategoryQuestion struct {
-	QuestionID int       // question_id
-	CategoryID int       // category_id
-	UpdatedAt  time.Time // updated_at
+	QuestionID      int       // question_id
+	CategoryID      int       // category_id
+	UpdatedAt       time.Time // updated_at
+	QuestionTxt     string    // question_txt
 }
 
 type MCategoryTree struct {

@@ -13,6 +13,7 @@ func main() {
     http.HandleFunc("/advertisement/", app.Advertisement)
     http.HandleFunc("/Answer/", app.Answer)
     http.HandleFunc("/AnswerShow/", app.AnswerShow)
+    http.HandleFunc("/category/", app.Category)
     http.HandleFunc("/CommentAdd/", app.CommentAdd)
     http.HandleFunc("/generate/", app.Generate)
     http.HandleFunc("/GenerateQuiz/", app.GenerateQuiz)

@@ -10,6 +10,8 @@ import (
     // "fmt"
     "strconv"
     "sort"
+    "strings"
+    // "unicode/utf8"
 )
 
 func Quiz(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +36,10 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         EtoColor string
         Available int
         BreadCrumb []BreadCrumb
+        Title string
+        Description string
+        OgImage string
+        Qtxt template.HTML
         // PleaseClick string
     }
     var view View
@@ -63,6 +69,30 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         }
         question = r
     }
+    
+    
+    txtLen := len([]rune(question.QuestionTxt))
+    titleLen := 32
+    descLen := 200
+    if txtLen < titleLen {
+        titleLen = txtLen
+        descLen  = txtLen
+    }
+    if txtLen < descLen {
+        descLen  = txtLen
+    }
+    // fmt.Printf("titleLen %#v\n", titleLen)
+    // fmt.Printf("descLen %#v\n", descLen)
+    view.Title = question.QuestionTxt[0:titleLen]
+    view.Description = "1." + question.Choice0 + ", 2." + question.Choice1+ ", 3." + question.Choice2+ ", 4." + question.Choice3 + ".." + question.QuestionTxt[titleLen:descLen]
+    if question.QuestionImg != "" {
+        view.OgImage = question.QuestionImg
+    }else{
+        view.OgImage = "/favicon.ico"
+    }
+    // s := strings.Replace(question.QuestionTxt, "\n", "<br>", -1)
+    // escape := template.HTML(strings.Replace(question.QuestionTxt, "\n", "<br>", -1))
+    view.Qtxt = template.HTML(strings.Replace(question.QuestionTxt, "\n", "<br>", -1))
     view.Q = question
     convert := make(map[int]string)
     var tree [][2]int
@@ -71,7 +101,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Print(err)
     }
-    var whereIn string
+    whereIn := ""
     for rows.Next() {
         r := common.MCategoryTree{}
         if err := rows.Scan(&r.LeafID,&r.Level1,&r.Level2,&r.Level3,&r.Level4,&r.Level5,&r.Level6,&r.Level7,&r.Level8,&r.UpdatedAt); err != nil {
@@ -132,35 +162,34 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
             convert[r.Level8] = ""
         }
     }
-    rows, err = db.Query("SELECT category_id, category_name FROM m_category_name WHERE category_id in ("+whereIn+")")
-    if err != nil {
-        log.Print(err)
-    }
-    for rows.Next() {
-        r := common.MCategoryName{}
-        if err := rows.Scan(&r.CategoryID,&r.CategoryName); err != nil {
+    if whereIn != "" {
+        rows, err = db.Query("SELECT category_id, category_name FROM m_category_name WHERE category_id in ("+whereIn+")")
+        if err != nil {
             log.Print(err)
         }
-        convert[r.CategoryID] = r.CategoryName
-        // categoryName = append(categoryName, r)
-        // breadCrumb[r.CategoryID]["name"] = r.CategoryName
+        for rows.Next() {
+            r := common.MCategoryName{}
+            if err := rows.Scan(&r.CategoryID,&r.CategoryName); err != nil {
+                log.Print(err)
+            }
+            convert[r.CategoryID] = r.CategoryName
+            // categoryName = append(categoryName, r)
+            // breadCrumb[r.CategoryID]["name"] = r.CategoryName
+        }
+        var breadCrumb []BreadCrumb
+        for _, v := range tree {
+            y := BreadCrumb{}
+            y.Level = v[0]
+            y.CategoryID = v[1]
+            y.CategoryName = convert[v[1]]
+            breadCrumb = append(breadCrumb, y)
+        }
+        
+        sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
+        // fmt.Printf("breadCrumb %#v\n", breadCrumb)
+        view.BreadCrumb = breadCrumb
     }
-    // fmt.Printf("tree %#v\n", tree)
-    // fmt.Printf("breadCrumb %#v\n", convert)
-    var breadCrumb []BreadCrumb
-    for _, v := range tree {
-        y := BreadCrumb{}
-        y.Level = v[0]
-        y.CategoryID = v[1]
-        y.CategoryName = convert[v[1]]
-        breadCrumb = append(breadCrumb, y)
-        // v.CategoryName = convert[v.CategoryID]
-        // fmt.Printf("convert %#v\n", convert[v[1]])
-    }
-    
-    sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
-    // fmt.Printf("breadCrumb %#v\n", breadCrumb)
-    view.BreadCrumb = breadCrumb
+
     tpl := template.Must(template.ParseFiles("html/quiz.html"))
     tpl.Execute(w, view)
 }

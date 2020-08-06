@@ -2,8 +2,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Quiz</title>
-    <link rel="shortcut icon" href="" />
+    <title>{{.Title}}</title>
+    <meta name="description" content="{{.Description}}">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta property="og:image" content="https://{{.OgImage}}" />
     <script src="/plugin/min.js"></script>
     <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
     <link rel="stylesheet" href="/css/pc.css{{.CacheV}}" media="only screen and (min-width : 711px)">
@@ -100,7 +102,7 @@
 </div>
 {{ end }}
 <div style="padding: 5px 5px 20px 5px;"> 
-No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span> 
+No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span> 
 {{ if eq .Available 0 }} <br>タップして音を聞いて下さい<br> {{end}}
 </div>
 <div id="app" :style="soundPlayed" line="182">
@@ -183,7 +185,7 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Q.QuestionTxt}}</span>
 
 <div>
 {{ range $v := .BreadCrumb }}
-<a style="margin:5px;" href="{{$v.CategoryID}}"> {{$v.CategoryName}} </a> >
+<a style="margin:5px;" href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a> >
 {{end}}
 </div>
 
