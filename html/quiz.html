@@ -93,7 +93,7 @@
   <audio id="audio_incorrect" controls><source src="/sound/incorrect.mp3"></audio>
 </div>
   
-<div id="play">
+<div id="play" onclick="playing();">
 
 <div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
 {{ if .Q.QuestionImg}}
@@ -105,7 +105,7 @@
 No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span> 
 {{ if eq .Available 0 }} <br>タップして音を聞いて下さい<br> {{end}}
 </div>
-<div id="app" :style="soundPlayed" line="182">
+<div id="app" line="182">
 <div style="position: relative;">
   <div style="position: absolute; width:100%; text-align: center;">
   <img src="/img/icon/circle_big.png" class="big_icon" v-if="circle">
@@ -244,15 +244,17 @@ function chgQtype(qType) {
 }
 
 if(available < 1){
+  $('a').css({ 'pointer-events': 'none' });
   var a = document.getElementById("audio");
-  $('#play').click(function(){
+  function playing() {
       if(available < 1){ a.play(); }
       setTimeout(function(){
         $('a').css({ 'pointer-events': '' });
         available = 1;
+        $('#app').css({ 'opacity': available });
       },2000);
-      $('.cho_pic').css({ 'displa': '1' });
-  });
+  }
+  $('#app').css({ 'opacity': available });
 }
 
 
@@ -337,11 +339,11 @@ var app = new Vue({
       });
     },
   },
-  computed: {
-    soundPlayed() {
-        return 'opacity: '+ available +';';
-    },
-  },
+  // computed: {
+  //   soundPlayed() {
+  //       return 'opacity: '+ available +';';
+  //   },
+  // },
 });
 
 function answerShow(){

@@ -2,8 +2,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Generate</title>
-    <link rel="shortcut icon" href="" />
+    <title>{{.CategoryName}}</title>
+    <meta name="description" content="{{.CategoryDescription}}">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <meta property="og:image" content="/favicon.ico" />
     <script src="/plugin/min.js"></script>
     <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
     <link rel="stylesheet" href="/css/pc.css{{.CacheV}}" media="only screen and (min-width : 711px)">
@@ -11,7 +13,26 @@
     <meta name="viewport" content="width=device-width, user-scalable=no" >
   </head>
 <style>
-
+.question {
+  width: 99%;
+  padding: 20px 10px 19px 10px;
+  word-break: break-word;
+  border-bottom: 1px solid #F5F5F5;
+}
+.question a {
+  display: block;
+  width: 100%;
+}
+.categoryName {
+  background-color: #F5F5F5;
+  width: 99%;
+  text-align: center;
+  padding: 10px;
+}
+.categoryName a {
+  display: block;
+  width: 100%;
+}
 </style>
 <body>
 <table id="header">
@@ -37,10 +58,6 @@
   <tr><td id="ad_menu"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
   <tr><td id="page_generate" style="background-color:white;">
     <a href="/generate/"><img src="/img/icon/pencil.png" class="icon"></a></td></tr>
-  <tr><td>
-    <a href="/">MyQuiz</a></td></tr>
-  <tr><td>
-    <a href="/">Login</a></td></tr>
   <tr><td id="page_top">
     <a href="/"><img src="/img/icon/home.png" class="icon"></a></td></tr>
   <tr><td>
@@ -51,27 +68,75 @@
 
 <div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
 
-hi
+<div>
+{{ range $v := .BreadCrumb }}
+<a style="margin:5px;" href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a> >
+{{end}}
+</div>
 
+<h3>{{.CategoryName}}</h3>
+<div>{{.CategoryTxt}}</div>
+
+<div id="app" style="min-height:700px;" v-if="csrf">
+<table><tr><td class="categoryName">新着クイズ</td></tr></table>
+<div class="question" v-for="d,k in Question">
+  <a :href="'/quiz/?q='+d.QuestionID"> [[ d.QuestionTxt ]] </a>
+</div>
+</div>
 {{ range $v := .CategoryList }}
-<div> $v.Level {{$v.Level}}</div>
-  {{ range $v2 := $v.CategoryQuestion }}
-  <div>{{ $v2.QuestionID }}</div>
-  {{end}}
+<table><tr><td class="categoryName">
+  <a href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a>
+</td></tr></table>
+{{ range $v2 := $v.CategoryQuestion }}
+<div class="question">
+  <a href="/quiz/?q={{ $v2.QuestionID }}"> {{ $v2.QuestionTitle }} </a>
+</div>
+{{end}}
 {{end}}
 
 </div>
 <br>
 <div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
 
+<script src="/js/common.js{{.CacheV}}"></script>
 
 <script>
-var u_id = '';
+var csrf = '{{.CSRF}}';
+var app = new Vue({
+  el: '#app',
+  delimiters: ['[[', ']]'],
+  data: {
+    Question:[],
+  },
+  methods: {
+    choose: function (choiced) {
+      if(available < 1){
+        return;
+      }
+    },
+  },
+  computed: {
+    soundPlayed() {
+        return 'opacity: '+ available +';';
+    },
+  },
+});
 
-</script>
-<script src="/js/common.js{{.cache_v}}"></script>
+function questionShow(){
+  $.get('/NewQuestionShow/',{csrf:csrf},function(){},"json")
+  .always(function(res){
+    if(res['Status']==1){
+      app.Question = res['Question'];
+      console.log(app.Question);
+    }else{
+      console.log(res);
+    }
+  });
+}
 
-<script>
+if(csrf){
+  questionShow();
+}
 
 </script>
 </body>

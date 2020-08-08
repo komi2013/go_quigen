@@ -7,7 +7,7 @@ import (
     "log"
     "net/http"
     "../common"
-    // "fmt"
+    "fmt"
     "strconv"
     "sort"
     "strings"
@@ -70,8 +70,8 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         question = r
     }
     
-    
-    txtLen := len([]rune(question.QuestionTxt))
+    txt := []rune(question.QuestionTxt)
+    txtLen := len(txt)
     titleLen := 32
     descLen := 200
     if txtLen < titleLen {
@@ -83,8 +83,9 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     }
     // fmt.Printf("titleLen %#v\n", titleLen)
     // fmt.Printf("descLen %#v\n", descLen)
-    view.Title = question.QuestionTxt[0:titleLen]
-    view.Description = "1." + question.Choice0 + ", 2." + question.Choice1+ ", 3." + question.Choice2+ ", 4." + question.Choice3 + ".." + question.QuestionTxt[titleLen:descLen]
+    // r.QuestionTxt = string(txt[0:titleLen])
+    view.Title = string(txt[0:titleLen])
+    view.Description = "1." + question.Choice0 + ", 2." + question.Choice1+ ", 3." + question.Choice2+ ", 4." + question.Choice3 + ".." + string(txt[titleLen:descLen])
     if question.QuestionImg != "" {
         view.OgImage = question.QuestionImg
     }else{
@@ -186,7 +187,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         }
         
         sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
-        // fmt.Printf("breadCrumb %#v\n", breadCrumb)
+        fmt.Printf("breadCrumb %#v\n", breadCrumb)
         view.BreadCrumb = breadCrumb
     }
 

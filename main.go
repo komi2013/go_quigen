@@ -18,8 +18,9 @@ func main() {
     http.HandleFunc("/generate/", app.Generate)
     http.HandleFunc("/GenerateQuiz/", app.GenerateQuiz)
     http.HandleFunc("/htm/", app.Htm)
+    http.HandleFunc("/NewQuestionShow/", app.NewQuestionShow)
     http.HandleFunc("/quiz/", app.Quiz)
-    
+    http.HandleFunc("/", app.Top)
     fmt.Println("starting..")
     log.Fatal(http.ListenAndServe(":9001", nil))
 }
