@@ -233,7 +233,7 @@ for(var i = 0; i < localQ.length; i++){
 }
 
 function chgQtype(qType) {
-  if(available < 1){
+  if(available != 1){
     return;
   }
   localStorage.qType = qType;
@@ -242,21 +242,21 @@ function chgQtype(qType) {
     return;
   },100);
 }
-
-if(available < 1){
+if(available == 0){
+  var audio = document.getElementById("audio");
   $('a').css({ 'pointer-events': 'none' });
-  var a = document.getElementById("audio");
-  function playing() {
-      if(available < 1){ a.play(); }
-      setTimeout(function(){
-        $('a').css({ 'pointer-events': '' });
-        available = 1;
-        $('#app').css({ 'opacity': available });
-      },2000);
-  }
   $('#app').css({ 'opacity': available });
 }
-
+function playing() {
+  if(available == 0){
+    audio.play();
+    setTimeout(function(){
+      $('a').css({ 'pointer-events': '' });
+      available = 1;
+      $('#app').css({ 'opacity': available });
+    },2000); 
+  }
+}
 
 var app = new Vue({
   el: '#app',
@@ -280,10 +280,10 @@ var app = new Vue({
   },
   methods: {
     choose: function (choiced) {
-      if(available < 1){
+      if(available != 1){
         return;
       }
-      available = 0;
+      available = 2;
       this.$set(this.choices[choiced],[2],'background-color: grey;');
       var correct = 0;
       if(app.choices[choiced][0] == 0){
@@ -306,10 +306,10 @@ var app = new Vue({
       }
     },
     describe: function (e) {
-      if(available < 1){
+      if(available != 1){
         return;
       }
-      available = 0;
+      available = 2;
       var correct = 0;
       if(this.choiceTxt == this.preChoices[0]){
         correct = 1;
@@ -386,13 +386,13 @@ function UIeffect(correct){
 function saveLocal(correct){
   var arrQ = [
     q_id
-    ,$('#question_txt').html()
+    ,$('#question_txt').html().replace(/<br>/g,"\n")
     ,app.preChoices
     ,$('#reference').html() ? $('#reference').html() : ''
     ,'{{.Q.QuestionType}}'
     ,'{{.Q.QuestionImg}}'
     ,correct
-    ,$('#explanation').html()
+    ,$('#explanation').html().replace(/<br>/g,"\n")
   ];
   if(qi > -1){
     localQ[qi] = arrQ;
@@ -420,7 +420,7 @@ function posting(mychoice){
   var param = {
     csrf           : csrf
     ,question_id   : q_id
-    ,question_txt  : $('#question_txt').html()
+    ,question_txt  : $('#question_txt').html().replace(/<br>/g,"\n")
     ,generator_id  : '{{.Q.UsrID}}'
     ,generator_img : '{{.Q.UsrImg}}'
     ,asked_at      : '{{.UpdatedAt}}'
@@ -433,7 +433,7 @@ function posting(mychoice){
     ,sequence      : '{{.Q.Sequence}}'
     ,mytext        : app.choiceTxt
     ,mychoice      : mychoice
-    ,explanation   : $('#explanation').html()
+    ,explanation   : $('#explanation').html().replace(/<br>/g,"\n")
   };
   $.post('/Answer/',param,function(){},"json")
   .always(function(res){});

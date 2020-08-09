@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Profile</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="/plugin/min.js"></script>
+    <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
+    <link rel="stylesheet" href="/css/pc.css{{.CacheV}}" media="only screen and (min-width : 711px)">
+    <link rel="stylesheet" href="/css/sp.css{{.CacheV}}" media="only screen and (max-width : 710px)">
+    <meta name="viewport" content="width=device-width, user-scalable=no" >
+  </head>
+<style>
+.graph_frame {
+  position: absolute;
+  height: 30px;
+  width: 100%;
+  border-bottom: 1px solid #F5F5F5;
+}
+.graph_date {
+  width: 60%;
+  display: inline-block;
+  vertical-align: middle;
+}
+.graph_txt {
+  display: inline-block;
+}
+.graph_img {
+  display: inline-block;
+  vertical-align: middle;
+}
+.graph_bar {
+  background-color: #bfd8e4;
+  height: 30px;
+}
+</style>
+<body>
+<table id="header">
+  <tr>
+  <td id="menu_td">
+    <img src="/img/icon/menu.png" class="icon">
+  </td>
+  <td>
+    <a href="/htm/news/"><span id="news_num"></span><img src="/img/icon/mail.png" class="icon"></a>
+  </td>
+  <td>
+    <a href="/rank/" ><img src="/img/icon/ranking.png" class="icon"></a>
+  </td>
+  <td>
+    <a href="/htm/data/" ><img src="/img/icon/bar-chart.png" class="icon"></a>
+  </td>
+  <td>
+    <a href="/htm/myprofile/" ><img src="/img/icon/guest.png" id="page_myimg" class="icon"></a>
+  </td>
+  </tr>
+</table>
+<table id="drawer">
+  <tr><td id="ad_menu"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
+  <tr><td id="page_generate" style="background-color:white;">
+    <a href="/generate/"><img src="/img/icon/pencil.png" class="icon"></a></td></tr>
+  <tr><td id="page_top">
+    <a href="/"><img src="/img/icon/home.png" class="icon"></a></td></tr>
+  <tr><td>
+    <a href="/htm/rule/"><img src="/img/icon/audit.png" class="icon"></a></td></tr>
+</table>
+
+<div id="content">
+
+<div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
+
+
+<template v-for="(d,k) in graph">
+<div class="graph_frame">
+  <div class="graph_date">[[ d["date"] ]]</div>
+  <div class="graph_img"> <img style="max-height:20px;" src="/img/icon/circle_big.png"></div>
+  <div class="graph_txt"> [[ d["correct"] ]] </div>
+</div>
+<div class="graph_bar" :style="d['bar']">&nbsp;</div>
+</template>
+
+</div>
+<br>
+<div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
+
+<script src="/js/common.js{{.CacheV}}"></script>
+
+<script>
+
+var csrf = '{{.CSRF}}';
+var daily = localStorage.daily ?  JSON.parse(localStorage.daily) : [];
+var correctAmt = 0;
+var answerAmt = 0;
+var max = 0;
+
+// for (var i=0; daily.length > i; i++) {
+for(var k in daily) {
+  correctAmt = correctAmt + daily[k][0];
+  answerAmt = answerAmt + daily[k][1];
+  if(max < daily[k][0]){
+    max = daily[k][0];
+  }
+}
+
+// keys = Object.keys(daily);
+
+// keys.sort(
+//   function(a,b){
+//     return (a < b ? 1 : -1);
+//   }
+// );
+console.log(dateFormat.format(new Date('2018-12-8'), 'yyyy年M月d日(WW)'));
+var graph = [];
+for (var i=0; 30 > i; i++) {
+  var obj = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - i);
+  var date = dateFormat.format(new Date(obj), 'yyyy-M-d');
+  // console.log(date);
+  var bar = "width:0%";
+  if(daily[date]){
+    bar = "width:" + daily[date][0] / max * 100 + "%";
+  }
+  graph[i] = { 
+    date: dateFormat.format(new Date(date), 'yyyy年M月d日(WW)'),
+    correct: daily[date] ? daily[date][0] : 0,
+    bar: bar };
+}
+
+console.log(graph);
+var app = new Vue({
+  el: '#content',
+  delimiters: ['[[', ']]'],
+  data: {
+    daily: daily,
+    ratio: Math.floor(correctAmt / answerAmt * 100),
+    answerAmt: answerAmt,
+  },
+  methods: {
+    del: function (k) {
+      this.q.splice(k, 1);
+      localStorage.q = JSON.stringify(this.q);
+    },
+  },
+  computed: {
+    // question() {
+    //   return this.q;
+    // },
+  },
+});
+// console.log(app.q);
+// for (var i=0; app.q.length > i; i++) {
+//   var q1 = app.q[i][1];
+//   var cutLen = 0;
+//   if(q1.length > 20){
+//     cutLen = q1.length - 20
+//     cutLen = -1 * cutLen;
+//     console.log(cutLen);
+//     app.q[i][1] = q1.slice(0,cutLen);
+//   }
+//   app.$set(app.q,i,app.q[i]);
+// }
+</script>
+</body>
+</html>
+

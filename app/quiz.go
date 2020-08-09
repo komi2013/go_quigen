@@ -21,7 +21,6 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 	}
-    u_id := common.GetUser(w,r)
     type BreadCrumb struct {
         Level int
         CategoryID int
@@ -46,7 +45,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     view.CacheV = common.CACHE_V
     view.CSRF = common.MakeCSRF(w,r)
     // view.PleaseClick = common.PLEASE_CLICK
-
+    u_id := common.GetUser(w,r)
     eto := common.Eto(u_id)
     view.Myphoto = eto[0]
     view.EtoColor = eto[1]

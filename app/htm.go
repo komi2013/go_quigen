@@ -8,21 +8,29 @@ import (
     // "os"
     // "log"
     // "time"
-    // "../common"
+    "../common"
     // "net/url"
     "strings"
 )
 
 func Htm(w http.ResponseWriter, r *http.Request) {
-    fmt.Printf("Path: %s\n", r.URL)
-    arr := strings.Split(r.URL.String(), "/")
-    fmt.Printf("ary2: %v\n", arr[2])
-    tpl := template.Must(template.ParseFiles("ad/ad_menu.html"))
-    m := map[string]string{
-      "Date": "Date",
-      "Time": "Time",
-      "Testt": "near",
+    type View struct {
+      CacheV string
+      CSRF string
+      Myphoto string
+      EtoColor string
     }
-    tpl.Execute(w, m)
+    var view View
+    view.CacheV = common.CACHE_V
+    view.CSRF = common.MakeCSRF(w,r)
+
+    u_id := common.GetUser(w,r)
+    eto := common.Eto(u_id)
+    view.Myphoto = eto[0]
+    view.EtoColor = eto[1]
+    fmt.Printf("eto %#v\n", eto)
+    uri := strings.Split(r.URL.String(), "/")
+    tpl := template.Must(template.ParseFiles("html/htm/"+uri[2]+".html"))
+    tpl.Execute(w, view)
 
 }
