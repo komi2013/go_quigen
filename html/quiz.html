@@ -28,8 +28,8 @@
 .cho_pic img {
   max-width: 99%;
 }
-.grey {
-  background-color: grey;
+.silver {
+  background-color: #EEEEEE;
 }
 .ans_u_correct td {
     height: 50px;
@@ -127,7 +127,7 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
       <img src="/img/icon/upload_0.png" class="icon" >
     </div>
   </div>
-  <table v-if="localStorage.qType == 0">
+  <table v-if="!localStorage.qType">
     <tr></tr><td class="choice" @click="choose(0)" :style="choices[0][2]" >[[ choices[0][1] ]]</td></tr>
     <tr></tr><td class="choice" @click="choose(1)" :style="choices[1][2]" >[[ choices[1][1] ]]</td></tr>
     <tr></tr><td class="choice" @click="choose(2)" :style="choices[2][2]" >[[ choices[2][1] ]]</td></tr>
@@ -139,8 +139,8 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 {{ if eq .Q.QuestionType 0 }}
 <table>
   <tr>
-  <td :class="{ grey: localStorage.qType == 1 }" onclick="chgQtype(1)"> <img src="/img/icon/textbox.png" class="icon"></td>
-  <td :class="{ grey: localStorage.qType == 0 }" onclick="chgQtype(0)"> <img src="/img/icon/choice.png" class="icon"> </td>
+  <td :class="{ silver: !localStorage.qType }" onclick="chgQtype(1)"> <img src="/img/icon/textbox.png" class="icon"></td>
+  <td :class="{ silver: localStorage.qType == 1}" onclick="chgQtype(0)"> <img src="/img/icon/choice.png" class="icon"> </td>
   </tr>
 </table>
 {{ end }}
@@ -236,7 +236,11 @@ function chgQtype(qType) {
   if(available != 1){
     return;
   }
-  localStorage.qType = qType;
+  if(qType == 1){
+    localStorage.qType = qType;
+  }else{
+    localStorage.removeItem('qType');
+  }
   setTimeout(function(){
     location.href = "" ;
     return;
@@ -302,7 +306,7 @@ var app = new Vue({
       },1000);
       saveLocal(correct);
       if(qi == -1){
-        posting(this.choices[choiced][0]);
+        posting(correct);
       }
     },
     describe: function (e) {
@@ -319,7 +323,7 @@ var app = new Vue({
       },1000);
       saveLocal(correct);
       if(qi == -1){
-        posting(-1);
+        posting(correct);
       }
     },
     commenting: function (k) {
@@ -416,24 +420,25 @@ function saveLocal(correct){
   }
   localStorage.daily = JSON.stringify(daily);
 }
-function posting(mychoice){
+function posting(correct){
   var param = {
     csrf           : csrf
     ,question_id   : q_id
-    ,question_txt  : $('#question_txt').html().replace(/<br>/g,"\n")
-    ,generator_id  : '{{.Q.UsrID}}'
-    ,generator_img : '{{.Q.UsrImg}}'
-    ,asked_at      : '{{.UpdatedAt}}'
-    ,preChoices    : JSON.stringify(app.preChoices)
-    ,reference     : $('#reference').html()
-    ,question_type : '{{.Q.QuestionType}}'
+    ,question_txt  : $('#question_txt').html().replace(/<br>/g,"").substr(0, 50)
+    // ,generator_id  : '{{.Q.UsrID}}'
+    // ,generator_img : '{{.Q.UsrImg}}'
+    // ,asked_at      : '{{.UpdatedAt}}'
+    // ,preChoices    : JSON.stringify(app.preChoices)
+    // ,reference     : $('#reference').html()
+    // ,question_type : '{{.Q.QuestionType}}'
     ,category_id   : '{{.Q.CategoryID}}'
-    ,question_img  : '{{.Q.QuestionImg}}'
+    // ,question_img  : '{{.Q.QuestionImg}}'
     ,respondent_img: myphoto
-    ,sequence      : '{{.Q.Sequence}}'
-    ,mytext        : app.choiceTxt
-    ,mychoice      : mychoice
-    ,explanation   : $('#explanation').html().replace(/<br>/g,"\n")
+    // ,sequence      : '{{.Q.Sequence}}'
+    // ,mytext        : app.choiceTxt
+    // ,mychoice      : mychoice
+    ,correct : correct 
+    // ,explanation   : $('#explanation').html().replace(/<br>/g,"\n")
   };
   $.post('/Answer/',param,function(){},"json")
   .always(function(res){});

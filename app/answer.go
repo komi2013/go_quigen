@@ -7,7 +7,7 @@ import (
     "log"
     "net/http"
     "../common"
-    "encoding/json"
+    // "encoding/json"
     // "encoding/base64"
     // "os"
     // "strings"
@@ -33,67 +33,37 @@ func Answer(w http.ResponseWriter, r *http.Request) {
         if err != nil {
             log.Print(err)
         }
-        type Nextval struct {
-            Int        int
-        }
-        var next []Nextval
+        var nextVal int
         for rows.Next() {
-            n := Nextval{}
-            if err := rows.Scan(&n.Int); err != nil {
+            if err := rows.Scan(&nextVal); err != nil {
                 log.Print(err)
             }
-            next = append(next,n)
         }
-        u_id = next[0].Int * -1
+        // fmt.Printf("nextVal %#v\n", nextVal)
+        u_id = nextVal * -1
         common.SetUser(w,r,u_id)
     }
-    fmt.Printf("%#v\n", u_id)
-    var choices [4]string
-    json.Unmarshal([]byte(r.FormValue("preChoices")), &choices)
+    // fmt.Printf("%#v\n", u_id)
+    // var choices [4]string
+    // json.Unmarshal([]byte(r.FormValue("preChoices")), &choices)
     // fmt.Printf("%#v\n", choices[0])
     // return
 
     _, err = db.Exec(`INSERT INTO h_answer(
         question_id   
-        ,question_txt  
-        ,generator_id  
-        ,generator_img 
-        ,asked_at      
-        ,choice_0    
-        ,choice_1    
-        ,choice_2    
-        ,choice_3    
-        ,reference     
-        ,question_type 
-        ,category_id   
-        ,question_img  
+        ,question_txt    
+        ,category_id    
         ,respondent_id 
         ,respondent_img
-        ,sequence      
-        ,mytext        
-        ,mychoice      
-        ,explanation
+        ,correct
         ,created_at
-        ) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)`, 
+        ) VALUES($1,$2,$3,$4,$5,$6,$7)`, 
         r.FormValue("question_id"),
         r.FormValue("question_txt"),
-        r.FormValue("generator_id"),
-        r.FormValue("generator_img"),
-        r.FormValue("asked_at"),
-        choices[0],
-        choices[1],
-        choices[2],
-        choices[3],
-        r.FormValue("reference"),
-        r.FormValue("question_type"),
         r.FormValue("category_id"),
-        r.FormValue("question_img"),
         u_id,
         r.FormValue("respondent_img"),
-        r.FormValue("sequence"),
-        r.FormValue("mytext"),
-        r.FormValue("mychoice"),
-        r.FormValue("explanation"),
+        r.FormValue("correct"),
         time.Now().Format("2006-01-02 15:04:05"))
     if err != nil {
         log.Print(err)

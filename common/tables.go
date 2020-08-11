@@ -7,24 +7,10 @@ import (
 type HAnswer struct {
 	QuestionID    int       // question_id
 	QuestionTxt   string    // question_txt
-	GeneratorID   int       // generator_id
-	GeneratorImg  string    // generator_img
-	AskedAt       time.Time // asked_at
-	Choice0       string    // choice_0
-	Choice1       string    // choice_1
-	Choice2       string    // choice_2
-	Choice3       string    // choice_3
-	Reference     string    // reference
-	QuestionType  int16     // question_type
 	CategoryID    int       // category_id
-	QuestionImg   string    // question_img
 	RespondentID  int       // respondent_id
 	RespondentImg string    // respondent_img
-	Sequence      int       // sequence
-	Mytext        string    // mytext
-	Mychoice      int16     // mychoice
-	Count         int       // count
-	Explanation   string    // explanation
+	Correct       float64       // correct
 	CreatedAt     time.Time // created_at
 	EtoColor      string    // not in table
 }

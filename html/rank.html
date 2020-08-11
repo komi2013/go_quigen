@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>My Profile</title>
+    <title>Rank</title>
     <link rel="shortcut icon" href="/favicon.ico">
     <script src="/plugin/min.js"></script>
     <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
@@ -11,16 +11,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no" >
   </head>
 <style>
-.question {
-  width: 99%;
-  padding: 20px 10px 19px 10px;
-  word-break: break-word;
-  border-bottom: 1px solid #F5F5F5;
-}
-div a {
-  display: block;
-  width: 100%;
-}
+
 </style>
 <body>
 <table id="header">
@@ -28,16 +19,16 @@ div a {
   <td id="menu_td">
     <img src="/img/icon/menu.png" class="icon">
   </td>
-  <td>
+  <td id="page_news">
     <a href="/htm/news/"><span id="news_num"></span><img src="/img/icon/mail.png" class="icon"></a>
   </td>
   <td>
+    <a href="/forumlist/" ><img src="/img/icon/list.png" class="icon"></a>
+  </td>
+  <td id="page_rank" >
     <a href="/rank/" ><img src="/img/icon/ranking.png" class="icon"></a>
   </td>
-  <td>
-    <a href="/htm/data/" ><img src="/img/icon/bar-chart.png" class="icon"></a>
-  </td>
-  <td>
+  <td id="page_myprofile" >
     <a href="/htm/myprofile/" ><img src="/img/icon/guest.png" id="page_myimg" class="icon"></a>
   </td>
   </tr>
@@ -56,20 +47,16 @@ div a {
 
 <div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
 
-<div>
-  <img class="icon" :src="myphoto" :style="'background-color: #'+etoColor">
-  <span>test</span>
-</div>
-
-<template v-for="d,k in q">
-  <div class="question">
-    <a :href="'/quiz/?q='+d[0]"> <img class="icon" :src="d[5]"> <span v-html="d[1]"> </span> </a>
-  </div>
-  <table><tr>
-    <td @click="del(k)"> <img class="icon" src="/img/icon/no_internet.png"> </td>
-    <td @click="del(k)"> <img class="icon" src="/img/icon/trash.png"> </td>
-  </tr></table>
-</template>
+<h3>{{ .CategoryName }}</h3>
+<table>
+  {{ range $v := .Usr }}
+  <tr>
+    <td><a href="/"> <img class="icon" src="{{$v.UsrImg}}" style="background-color:#{{$v.EtoColor}}" ></a></td>
+    <td><img class="icon" src="/img/icon/circle_big.png"></td>
+    <td>{{$v.Sum}}</td>
+  </tr>
+  {{end}}
+</table>
 
 </div>
 <br>
@@ -79,39 +66,6 @@ div a {
 
 <script>
 
-var csrf = '{{.CSRF}}';
-var app = new Vue({
-  el: '#content',
-  delimiters: ['[[', ']]'],
-  data: {
-    myphoto: localStorage.myphoto ? localStorage.myphoto : '{{.Myphoto}}',
-    etoColor: '{{.EtoColor}}',
-    q: localStorage.q ? JSON.parse(localStorage.q) : [],
-  },
-  methods: {
-    del: function (k) {
-      this.q.splice(k, 1);
-      localStorage.q = JSON.stringify(this.q);
-    },
-  },
-  computed: {
-    // question() {
-    //   return this.q;
-    // },
-  },
-});
-console.log(app.q);
-for (var i=0; app.q.length > i; i++) {
-  var q1 = app.q[i][1];
-  var cutLen = 0;
-  if(q1.length > 20){
-    cutLen = q1.length - 20
-    cutLen = -1 * cutLen;
-    console.log(cutLen);
-    app.q[i][1] = q1.slice(0,cutLen);
-  }
-  app.$set(app.q,i,app.q[i]);
-}
 </script>
 </body>
 </html>

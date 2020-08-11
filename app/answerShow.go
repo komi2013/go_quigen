@@ -22,7 +22,7 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 	}
-    rows, err := db.Query("SELECT choice_0, created_at, respondent_id, respondent_img, mytext, mychoice FROM h_answer WHERE question_id = $1", r.FormValue("q"))
+    rows, err := db.Query("SELECT respondent_id ,respondent_img ,correct ,created_at FROM h_answer WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
         log.Print(err)
     }
@@ -31,13 +31,11 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
     var correctNum float64 = 0
     for rows.Next() {
         r := common.HAnswer{}
-        if err := rows.Scan(&r.Choice0, &r.CreatedAt, &r.RespondentID, &r.RespondentImg, &r.Mytext, &r.Mychoice); err != nil {
+        if err := rows.Scan(&r.RespondentID, &r.RespondentImg, &r.Correct, &r.CreatedAt); err != nil {
             log.Print(err)
         }
         answer = append(answer,r)
-        if r.Choice0 == r.Mytext || r.Mychoice == 0 {
-            correctNum++
-        }
+        correctNum = correctNum + r.Correct
         count++
     }
     answerRatio := math.Round(correctNum / count * 100)
@@ -60,11 +58,11 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
             d.RespondentImg = eto[0]
             d.EtoColor = eto[1]
         }
-        if (d.Choice0 == d.Mytext || d.Mychoice == 0) && coU < 16 {
+        if d.Correct == 1 && coU < 16 {
             correctUsr[coU][0] = d.RespondentImg
             correctUsr[coU][1] = "background-color:#" + d.EtoColor
             coU++
-        } else if (d.Choice0 != d.Mytext && d.Mychoice != 0) && inU < 16 {
+        } else if d.Correct == 0 && inU < 16 {
             incorrectUsr[inU][0] = d.RespondentImg
             incorrectUsr[inU][1] = "background-color:#" + d.EtoColor
             inU++

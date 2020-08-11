@@ -47,7 +47,7 @@
     <a href="/rank/" ><img src="/img/icon/ranking.png" class="icon"></a>
   </td>
   <td>
-    <a href="/htm/data/" ><img src="/img/icon/bar-chart.png" class="icon"></a>
+    <a href="/mydata/" ><img src="/img/icon/bar-chart.png" class="icon"></a>
   </td>
   <td>
     <a href="/htm/myprofile/" ><img src="/img/icon/guest.png" id="page_myimg" class="icon"></a>
@@ -92,7 +92,6 @@ var correctAmt = 0;
 var answerAmt = 0;
 var max = 0;
 
-// for (var i=0; daily.length > i; i++) {
 for(var k in daily) {
   correctAmt = correctAmt + daily[k][0];
   answerAmt = answerAmt + daily[k][1];
@@ -101,13 +100,6 @@ for(var k in daily) {
   }
 }
 
-// keys = Object.keys(daily);
-
-// keys.sort(
-//   function(a,b){
-//     return (a < b ? 1 : -1);
-//   }
-// );
 console.log(dateFormat.format(new Date('2018-12-8'), 'yyyy年M月d日(WW)'));
 var graph = [];
 for (var i=0; 30 > i; i++) {
@@ -119,7 +111,7 @@ for (var i=0; 30 > i; i++) {
     bar = "width:" + daily[date][0] / max * 100 + "%";
   }
   graph[i] = { 
-    date: dateFormat.format(new Date(date), 'yyyy年M月d日(WW)'),
+    date: dateFormat.format(new Date(date), '{{ .DateLanguage }}'),
     correct: daily[date] ? daily[date][0] : 0,
     bar: bar };
 }
@@ -145,18 +137,7 @@ var app = new Vue({
     // },
   },
 });
-// console.log(app.q);
-// for (var i=0; app.q.length > i; i++) {
-//   var q1 = app.q[i][1];
-//   var cutLen = 0;
-//   if(q1.length > 20){
-//     cutLen = q1.length - 20
-//     cutLen = -1 * cutLen;
-//     console.log(cutLen);
-//     app.q[i][1] = q1.slice(0,cutLen);
-//   }
-//   app.$set(app.q,i,app.q[i]);
-// }
+
 </script>
 </body>
 </html>
