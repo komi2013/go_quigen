@@ -23,26 +23,14 @@ func Rank(w http.ResponseWriter, r *http.Request) {
     UsrID        int
     UsrImg       string
     EtoColor     string
-    // LatestAnswer time.time
   }
-  // type BreadCrumb struct {
-  //   Level int
-  //   CategoryID int
-  //   CategoryName string
-  // }
-  // type CategoryList struct {
-  //   Level string
-  //   CategoryID int
-  //   CategoryName string
-  // }
+
   type View struct {
     CacheV       string
     CategoryID   string
     CategoryName string
     CategoryTxt  template.HTML
     Usr          []Usr
-    // BreadCrumb   []BreadCrumb
-    // CategoryList []CategoryList
   }
   var view View
   view.CacheV = common.CACHE_V
@@ -50,6 +38,7 @@ func Rank(w http.ResponseWriter, r *http.Request) {
   cookie, err := r.Cookie("cat")
   if err != nil {
     log.Print("No cat Cookie: ", err)
+    http.Redirect(w, r, "/", 301)
     return
   }
   t := time.Now()
@@ -73,11 +62,9 @@ func Rank(w http.ResponseWriter, r *http.Request) {
       }
       eto := common.Eto(r.UsrID)
       r.UsrImg = eto[0]
-      // r.EtoColor = `style="background-color: #` + eto[1] + `";`
       r.EtoColor =  eto[1]
       usr = append(usr,r)
   }
-  // fmt.Printf("usr %#v\n", usr)
   sort.Slice(usr, func(i, j int) bool { return usr[i].Sum > usr[j].Sum }) // DESC
   view.Usr = usr
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Message</title>
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="/plugin/min.js"></script>
+    <link rel="stylesheet" href="/css/common.css{{.CacheV}}" />
+    <link rel="stylesheet" href="/css/pc.css{{.CacheV}}" media="only screen and (min-width : 711px)">
+    <link rel="stylesheet" href="/css/sp.css{{.CacheV}}" media="only screen and (max-width : 710px)">
+    <meta name="viewport" content="width=device-width, user-scalable=no" >
+  </head>
+<style>
+.autoHeight{  
+  overflow: hidden;
+  width:  90%;
+  display: inline-block;
+  border-radius:10px;
+  vertical-align: bottom;
+}
+.msg {
+  background-color: white;
+  padding: 8px;
+  border-radius: 16px;
+  display: inline-block;
+}
+</style>
+<body>
+<table id="header">
+  <tr>
+  <td id="menu_td">
+    <img src="/img/icon/menu.png" class="icon">
+  </td>
+  <td id="page_news">
+    <a href="/htm/news/"><span id="news_num"></span><img src="/img/icon/mail.png" class="icon"></a>
+  </td>
+  <td>
+    <a href="/forumlist/" ><img src="/img/icon/list.png" class="icon"></a>
+  </td>
+  <td id="page_rank" >
+    <a href="/rank/" ><img src="/img/icon/ranking.png" class="icon"></a>
+  </td>
+  <td id="page_myprofile" >
+    <a href="/htm/myprofile/" ><img src="/img/icon/guest.png" id="page_myimg" class="icon"></a>
+  </td>
+  </tr>
+</table>
+<table id="drawer">
+  <tr><td id="ad_menu"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
+  <tr><td id="page_generate" style="background-color:white;">
+    <a href="/generate/"><img src="/img/icon/pencil.png" class="icon"></a></td></tr>
+  <tr><td id="page_top">
+    <a href="/"><img src="/img/icon/home.png" class="icon"></a></td></tr>
+  <tr><td>
+    <a href="/htm/rule/"><img src="/img/icon/audit.png" class="icon"></a></td></tr>
+</table>
+
+<div id="content" style="background-color:#EEEEEE;">
+
+<div id="ad"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
+
+<table v-if="opponent == 0">
+  <tr v-for="(d,k) in msgList" style="border-bottom: 1px solid white;">
+    <td style="width:50px;"><a href="/"> <img class="icon" :src="d.OpponentImg" :style="'background-color:#'+d.OpponentColor" ></a></td>
+    <td style="text-align:left;" v-html="d.Msg[d.Msg.length -1].Txt" @click="openMsg(d.OpponentID)"></td>
+  </tr>
+</table>
+
+
+<template v-for="(d,k) in msgList" v-if="d.OpponentID == opponent">
+  <img :style="'max-width:30px;background-color:#'+d.OpponentColor" :src="d.OpponentImg">
+  <template v-for="(d2,k2) in d.Msg" >
+  <div style="text-align:left;" v-if="d2.SenderFlg == '0'">
+    <img :style="'max-width:30px;background-color:#'+d.OpponentColor" :src="d.OpponentImg"> 
+    <span class="msg" v-html="d2.Txt.substring(0,100).replace('\n', '<br>')"></span>
+  </div>
+  <div style="text-align:right;" v-if="d2.SenderFlg == '1'">
+    <span class="msg" v-html="d2.Txt.substring(0,100).replace('\n', '<br>')"></span>
+  </div>
+  
+  </template>
+  <table><tr>
+    <td style="text-align:center;"><textarea class="autoHeight" v-model="messageContent" v-on:keydown="expand"></textarea></td>
+    <td style="width:50px;">
+      <img class="icon" src="/img/icon/upload_0.png" v-if="messageContent" @click="sending">
+    </td>
+  </tr></table>
+</template>
+
+</div>
+<br>
+<div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
+
+<script defer src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
+<script defer src="/js/common.js{{.CacheV}}"></script>
+
+<script>
+var csrf = '{{.CSRF}}';
+
+var app = new Vue({
+  el: '#content',
+  delimiters: ['[[', ']]'],
+  data: {
+    msgList: JSON.parse('{{.MsgList}}'),
+    opponent: '{{.Opponent}}',
+    messageContent: '',
+    height: 50,
+  },
+  methods: {
+    openMsg: function (o) {
+      this.opponent = o;
+    },
+    expand: function (e) {
+      const element = document.querySelector('.autoHeight');
+      element.style.height = 'auto'
+      if(this.value !== '') {
+        element.style.height = element.scrollHeight + 'px'
+      } else {
+        element.style.height = '0'
+      }
+    },
+    calling: function (e) {
+      console.log("calling");
+    },
+    sending: function (e) {
+      var param = {
+        csrf : csrf,
+        message_content : this.messageContent,
+        receiver : this.opponent,
+        sender_img : myphoto = localStorage.myphoto ? localStorage.myphoto : ''
+      };
+      $.post('/MessageAdd/',param,function(){},"json")
+      .always(function(res){
+        if(res['Status']==1){
+          location.href = "";
+        }else{
+          console.log(res);
+        }
+      });
+    },
+  },
+});
+
+</script>
+
+</body>
+</html>
+

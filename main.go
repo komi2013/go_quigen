@@ -18,6 +18,8 @@ func main() {
     http.HandleFunc("/generate/", app.Generate)
     http.HandleFunc("/GenerateQuiz/", app.GenerateQuiz)
     http.HandleFunc("/htm/", app.Htm)
+    http.HandleFunc("/message/", app.Message)
+    http.HandleFunc("/MessageAdd/", app.MessageAdd)
     http.HandleFunc("/mydata/", app.Mydata)
     http.HandleFunc("/NewQuestionShow/", app.NewQuestionShow)
     http.HandleFunc("/quiz/", app.Quiz)
