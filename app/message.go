@@ -10,7 +10,7 @@ import (
     _ "github.com/lib/pq"
     // "sort"
     "fmt"
-    // "strconv"
+    "strconv"
     "encoding/json"
     "html"
     "strings"
@@ -51,9 +51,6 @@ func Message(w http.ResponseWriter, r *http.Request) {
   view.Opponent = "0"
   uri := strings.Split(r.URL.Path, "/")
   fmt.Printf("url %#v\n", uri[2])
-  if uri[2] != "" {
-    view.Opponent = uri[2]
-  }
 
   // var msgList MsgList
   k1 := map[string][]map[string]string{}
@@ -74,8 +71,6 @@ func Message(w http.ResponseWriter, r *http.Request) {
   // s["2"] = k
   // usrMap1 := map[string]map[string]map[string]string{}
   // usrMap1["1"] = s
-
-  fmt.Printf("k1 %#v\n", k1)
 
   // fmt.Printf("usrMap1 %#v\n", usrMap1)
   // return
@@ -117,7 +112,20 @@ func Message(w http.ResponseWriter, r *http.Request) {
         usrMap[sender] = append(usrMap[sender], d)
       }
   }
-
+  if uri[2] != "" {
+    view.Opponent = uri[2]
+    op, err := strconv.Atoi(uri[2])
+    if err != nil {
+      fmt.Printf("err %#v\n", err)
+      return
+    }
+    if op < 0 && u_id < 0 {
+      fmt.Printf("op < 0 && u_id < 0 %#v\n", op)
+      return
+    }
+    usrMap[op] = append(usrMap[op], map[string]string{})
+  }
+  
   var msgList []MsgList
   for i, v := range usrMap {
     var msg []Msg
