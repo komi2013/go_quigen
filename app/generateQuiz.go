@@ -23,32 +23,27 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
         fmt.Fprint(w, `["2","CSRF Error"]`)
         return
     }
-	connStr := "user=exam_8099 password=Zk1CGsBK dbname=go_english sslmode=disable port=5432 host=194.135.95.163"
+	connStr := common.DB_CONNECT
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
 	}
-
 	rows, err := db.Query("SELECT NEXTVAL('t_question_question_id_seq')")
     if err != nil {
         log.Print(err)
     }
-    var next []common.Table3
+    var nextval int
     for rows.Next() {
-        n := common.Table3{}
-        if err := rows.Scan(&n.Int); err != nil {
+        if err := rows.Scan(&nextval); err != nil {
             log.Print(err)
         }
-        next = append(next,n)
     }
-    fmt.Printf("%#v\n", next)
-    fmt.Printf("%#v\n", next[0].Int)
-    question_id := next[0].Int
+    question_id := nextval
     img := ""
     if r.FormValue("img") != "no" {
         img = strings.Replace(r.FormValue("img"), "data:image/png;base64,", "", 1)
         data, _ := base64.StdEncoding.DecodeString(img)
-        dir := "/img/question/" + time.Now().Format("20060102") + "/"
+        dir := "/data/img_question/" + time.Now().Format("20060102") + "/"
         os.Mkdir("public" + dir, 0777)
         file, _ := os.Create("public" + dir + strconv.Itoa(question_id) + ".png")
         defer file.Close()

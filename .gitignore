@@ -1,2 +1,5 @@
 go
 public/img/question/*
+public/data/*
+public/content/*
+common/config.go.env

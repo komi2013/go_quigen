@@ -80,7 +80,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     if txtLen < descLen {
         descLen  = txtLen
     }
-    // fmt.Printf("titleLen %#v\n", titleLen)
+    // fmt.Printf("question %#v\n", question)
     // fmt.Printf("descLen %#v\n", descLen)
     // r.QuestionTxt = string(txt[0:titleLen])
     view.Title = string(txt[0:titleLen])

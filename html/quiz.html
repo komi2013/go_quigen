@@ -25,7 +25,7 @@
   width: 49%;
   text-align: center;
 }
-.cho_pic img {
+.choicePicture td img {
   max-width: 99%;
 }
 .silver {
@@ -78,7 +78,7 @@
 <div id="content">
 
 <div style="position:absolute;top:-10000px;">
-  {{ if .Q.Sound }}
+  {{ if eq .Available 0 }}
   <audio id="audio" controls><source src="{{.Q.Sound}}"></audio>
   {{ end }}
   <audio id="audio_correct" controls><source src="/sound/correct.mp3"></audio>
@@ -246,10 +246,10 @@ if(available == 0){
 function playing() {
   if(available == 0){
     audio.play();
+    $('#app').css({ 'opacity': 1 });
     setTimeout(function(){
       $('a').css({ 'pointer-events': '' });
       available = 1;
-      $('#app').css({ 'opacity': available });
     },2000); 
   }
 }
