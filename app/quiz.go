@@ -7,7 +7,7 @@ import (
     "log"
     "net/http"
     "../common"
-    "fmt"
+    // "fmt"
     "strconv"
     "sort"
     "strings"
@@ -20,7 +20,8 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
     type BreadCrumb struct {
         Level int
         CategoryID int
@@ -186,7 +187,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         }
         
         sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
-        fmt.Printf("breadCrumb %#v\n", breadCrumb)
+        // fmt.Printf("breadCrumb %#v\n", breadCrumb)
         view.BreadCrumb = breadCrumb
     }
 

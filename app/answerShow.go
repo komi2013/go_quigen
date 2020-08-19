@@ -21,7 +21,8 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", common.DB_CONNECT)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
     rows, err := db.Query("SELECT respondent_id ,respondent_img ,correct ,created_at FROM h_answer WHERE question_id = $1", r.FormValue("q"))
     if err != nil {
         log.Print(err)

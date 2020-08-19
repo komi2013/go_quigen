@@ -7,6 +7,7 @@ import (
     "net/http"
     // "time"
     "./app"
+    "./common"
 )
 
 func main() {
@@ -26,5 +27,5 @@ func main() {
     http.HandleFunc("/rank/", app.Rank)
     http.HandleFunc("/", app.Top)
     fmt.Println("starting..")
-    log.Fatal(http.ListenAndServe(":9001", nil))
+    log.Fatal(http.ListenAndServe(common.GO_PORT, nil))
 }

@@ -10,7 +10,7 @@ import (
 
 func SetUser(w http.ResponseWriter, r *http.Request, id int) {
 	txt := strconv.Itoa(id)
-	txt = Encrypt(SESSION_KEY,txt)
+	txt = Encrypt(SS_KEY,txt)
     cookie := &http.Cookie{
         Name: "ss",
 		Value: txt,
@@ -21,7 +21,7 @@ func SetUser(w http.ResponseWriter, r *http.Request, id int) {
 	}
 	http.SetCookie(w, cookie)
 	txt = time.Now().Format("2006-01-02 15:04:05")
-	txt = Encrypt(SESSION_KEY,txt)
+	txt = Encrypt(T1_KEY,txt)
     cookie1 := &http.Cookie{
         Name: "ti",
 		Value: txt,
@@ -40,7 +40,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 		log.Print("No ss Cookie: ", err)
 		return 0
 	}
-	ss := Decrypt(SESSION_KEY,cookie.Value)
+	ss := Decrypt(SS_KEY,cookie.Value)
 
 	delete := false
 	if ss == "" {
@@ -55,7 +55,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
     if err != nil {
 		log.Print("No ti Cookie: ", err)
 	}
-	t1 := Decrypt(SESSION_KEY,cookie.Value)
+	t1 := Decrypt(T1_KEY,cookie.Value)
 
 	if t1 == "" {
 		log.Print("ti is wrong: ", err)

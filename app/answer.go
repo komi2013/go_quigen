@@ -27,6 +27,7 @@ func Answer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
     }
+    defer db.Close()
     u_id := common.GetUser(w,r)
     if (u_id == 0) {
         rows, err := db.Query("SELECT NEXTVAL('nologin_usr_id_seq')")
