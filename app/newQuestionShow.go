@@ -20,6 +20,7 @@ func NewQuestionShow(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
     }
+    defer db.Close()
     type Question struct {
         QuestionID       int
         QuestionTxt   string

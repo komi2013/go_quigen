@@ -95,7 +95,9 @@
 {{ end }}
 <div style="padding: 5px 5px 20px 5px;"> 
 No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span> 
-{{ if eq .Available 0 }} <br>タップして音を聞いて下さい<br> {{end}}
+{{ if eq .Available 0 }}
+<div style="width:100%;text-align:center;" onclick="playingAudio();"><img src="/img/icon/speaker.png"></div> 
+{{end}}
 </div>
 <div id="app" line="182">
 <div style="position: relative;">
@@ -177,7 +179,7 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 
 <div>
 {{ range $v := .BreadCrumb }}
-<a style="margin:5px;" href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a> >
+&nbsp;<a style="margin: 5px 0px 5px 0px;" href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a> > &nbsp;
 {{end}}
 </div>
 
@@ -200,9 +202,12 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 
 <script>
 
+localStorage.myphoto  = '{{.Myphoto}}';
+localStorage.etoColor = '{{.EtoColor}}';
+
 var csrf = '{{.CSRF}}';
 var q_id = '{{.Q.QuestionID}}';
-var myphoto = localStorage.myphoto ? localStorage.myphoto : '{{.Myphoto}}';
+var myphoto = '{{.Myphoto}}';
 var etoColor = '{{.EtoColor}}';
 var available = '{{.Available}}';
 
@@ -253,7 +258,11 @@ function playing() {
     },2000); 
   }
 }
-
+function playingAudio() {
+  if(available == 1 && audio){
+    audio.play();
+  }
+}
 var app = new Vue({
   el: '#app',
   delimiters: ['[[', ']]'],
@@ -327,7 +336,7 @@ var app = new Vue({
         csrf : csrf,
         comment_txt : this.commentTxt,
         question_id : q_id,
-        usr_img : myphoto
+        usr_img : etoColor ? '' : myphoto
       };
       $.post('/CommentAdd/',param,function(){},"json")
       .always(function(res){
@@ -378,7 +387,9 @@ function UIeffect(correct){
   }
   app.AnswerCalc[0] = Math.round(correctAmount / app.AnswerCalc[1] * 100);
   setTimeout(function(){
-    location.href = $('#nextQ').attr('href');
+    if($('#nextQ').attr('href') != '/quiz/?q=0'){
+      location.href = $('#nextQ').attr('href');
+    }
   },200);
 }
 function saveLocal(correct){
@@ -412,6 +423,11 @@ function saveLocal(correct){
   }else{
     daily[today] = [correct,1];
   }
+  for(var k in daily) {
+    if(k.split("-")[1] != new Date().getMonth()+1 && k.split("-")[1] != new Date().getMonth()){
+      delete daily[k];
+    }
+  }
   localStorage.daily = JSON.stringify(daily);
 }
 function posting(correct){
@@ -421,7 +437,7 @@ function posting(correct){
     ,question_id   : q_id
     ,question_txt  : $('#question_txt').html().replace(/<br>/g,"").substr(0, 50)
     ,category_id   : '{{.Q.CategoryID}}'
-    ,respondent_img: myphoto
+    ,respondent_img: etoColor ? '' : myphoto
     ,correct : correct
   };
   $.post('/Answer/',param,function(){},"json")

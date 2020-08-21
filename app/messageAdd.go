@@ -26,7 +26,8 @@ func MessageAdd(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", common.DB_CONNECT)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
     _, err = db.Exec(`INSERT INTO t_message(
         sender,receiver,message_content,created_at,sender_img
         ) VALUES($1,$2,$3,$4,$5)`, 

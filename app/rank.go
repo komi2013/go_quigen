@@ -17,7 +17,8 @@ func Rank(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
-	}
+  }
+  defer db.Close()
   type Usr struct {
     Sum          int
     UsrID        int

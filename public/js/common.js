@@ -40,3 +40,9 @@ dateFormat =
   _priority : ["hh", "h", "mm", "m", "ss", "dd", "d", "s", "yyyy", "yy", "t", "w", "WW", "MMMM", "MMM", "MM", "M", "$"],
   format: function(date, format){return this._priority.reduce((res, fmt) => res.replace(fmt, this._fmt[fmt](date)), format)}
 }
+if(localStorage.etoColor){
+  $('#page_myimg').css({'background-color':'#'+localStorage.etoColor});
+}
+if(localStorage.myphoto){
+  $('#page_myimg').attr('src',localStorage.myphoto); 
+}

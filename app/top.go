@@ -20,7 +20,8 @@ func Top(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
     type CategoryQuestion struct {
         QuestionID string
         QuestionTitle string

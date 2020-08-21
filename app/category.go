@@ -20,7 +20,8 @@ func Category(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
     type BreadCrumb struct {
         Level int
         CategoryID int

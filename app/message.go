@@ -22,6 +22,7 @@ func Message(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
   }
+  defer db.Close()
   type Msg struct {
     Txt       string
     SenderFlg string

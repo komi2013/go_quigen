@@ -27,7 +27,8 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Print(err)
-	}
+    }
+    defer db.Close()
 	rows, err := db.Query("SELECT NEXTVAL('t_question_question_id_seq')")
     if err != nil {
         log.Print(err)
