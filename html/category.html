@@ -73,6 +73,12 @@
 <h3>{{.CategoryName}}</h3>
 <div>{{.CategoryTxt}}</div>
 
+{{ range $v2 := .CategoryQuestion }}
+<div class="question">
+  <a href="/quiz/?q={{ $v2.QuestionID }}"> {{ $v2.QuestionTitle }} </a>
+</div>
+{{end}}
+
 {{ range $v := .CategoryList }}
 <table><tr><td class="categoryName">
   <a href="/category/{{$v.Level}}/{{$v.CategoryID}}/"> {{$v.CategoryName}} </a>
@@ -120,7 +126,7 @@ function questionShow(){
 }
 
 if(csrf){
-  questionShow();
+//  questionShow();
 }
 
 </script>

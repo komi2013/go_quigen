@@ -13,6 +13,7 @@ import (
 )
 
 func Rank(w http.ResponseWriter, r *http.Request) {
+  u_id := common.GetUser(w,r)
 	connStr := common.DB_CONNECT
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -24,6 +25,7 @@ func Rank(w http.ResponseWriter, r *http.Request) {
     UsrID        int
     UsrImg       string
     EtoColor     string
+    MeColor      string
   }
 
   type View struct {
@@ -35,11 +37,10 @@ func Rank(w http.ResponseWriter, r *http.Request) {
   }
   var view View
   view.CacheV = common.CACHE_V
-
   cookie, err := r.Cookie("cat")
   if err != nil {
     log.Print("No cat Cookie: ", err)
-    http.Redirect(w, r, "/", 301)
+    http.Redirect(w, r, "/", 302)
     return
   }
   t := time.Now()
@@ -64,6 +65,10 @@ func Rank(w http.ResponseWriter, r *http.Request) {
       eto := common.Eto(r.UsrID)
       r.UsrImg = eto[0]
       r.EtoColor =  eto[1]
+      r.MeColor = "#EEEEEE"
+      if r.UsrID == u_id {
+        r.MeColor = "white"
+      }
       usr = append(usr,r)
   }
   sort.Slice(usr, func(i, j int) bool { return usr[i].Sum > usr[j].Sum }) // DESC

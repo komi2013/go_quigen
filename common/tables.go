@@ -27,6 +27,7 @@ type MCategoryQuestion struct {
 	CategoryID        int       // category_id
 	UpdatedAt         time.Time // updated_at
 	QuestionTitle     string    // question_txt
+	InList            int       // in_list
 }
 
 type MCategoryTree struct {

@@ -43,6 +43,7 @@ func Top(w http.ResponseWriter, r *http.Request) {
         CategoryDescription string
         CategoryTxt template.HTML
         BreadCrumb []int
+        CategoryQuestion []CategoryQuestion
     }
     var view View
     view.CacheV = common.CACHE_V
@@ -86,13 +87,13 @@ func Top(w http.ResponseWriter, r *http.Request) {
     }
     var categoryQuestionPre []common.MCategoryQuestion
 
-    rows, err = db.Query("SELECT question_id, category_id, question_title FROM m_category_question WHERE category_id in ("+whereIn2+")")
+    rows, err = db.Query("SELECT question_id, category_id, question_title, in_list FROM m_category_question WHERE category_id in ("+whereIn2+")")
     if err != nil {
         log.Print(err)
     }
     for rows.Next() {
         r := common.MCategoryQuestion{}
-        if err := rows.Scan(&r.QuestionID,&r.CategoryID,&r.QuestionTitle); err != nil {
+        if err := rows.Scan(&r.QuestionID,&r.CategoryID,&r.QuestionTitle,&r.InList); err != nil {
             log.Print(err)
         }
         categoryQuestionPre = append(categoryQuestionPre, r)
@@ -106,7 +107,7 @@ func Top(w http.ResponseWriter, r *http.Request) {
         y.CategoryName = v["category_name"]
         var categoryQuestion []CategoryQuestion
         for _, v2 := range categoryQuestionPre {
-            if y.CategoryID == v2.CategoryID {
+            if y.CategoryID == v2.CategoryID && v2.InList == 1 {
                 y2 := CategoryQuestion{}
                 y2.QuestionID = strconv.Itoa(v2.QuestionID)
                 y2.QuestionTitle = v2.QuestionTitle
@@ -119,6 +120,17 @@ func Top(w http.ResponseWriter, r *http.Request) {
 
     res, _ := json.Marshal(categoryList)
     fmt.Printf("%#v\n", string(res))
+    var categoryQuestion []CategoryQuestion
+    for _, v2 := range categoryQuestionPre {
+        if v2.InList == 0 {
+            y2 := CategoryQuestion{}
+            y2.QuestionID = strconv.Itoa(v2.QuestionID)
+            y2.QuestionTitle = v2.QuestionTitle
+            categoryQuestion = append(view.CategoryQuestion, y2)
+        }
+    }
+    fmt.Printf("%#v\n", categoryQuestion)
+    view.CategoryQuestion = categoryQuestion
     // var categoryQuestion []common.MCategoryQuestion
     // x = common.MCategoryQuestion{}
     // x.QuestionID = 1

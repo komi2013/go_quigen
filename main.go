@@ -26,6 +26,6 @@ func main() {
     http.HandleFunc("/quiz/", app.Quiz)
     http.HandleFunc("/rank/", app.Rank)
     http.HandleFunc("/", app.Top)
-    fmt.Println("starting..")
+    fmt.Println("starting.." + common.CACHE_V)
     log.Fatal(http.ListenAndServe(common.GO_PORT, nil))
 }

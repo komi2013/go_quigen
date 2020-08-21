@@ -46,7 +46,7 @@
 <h3>{{ .CategoryName }}</h3>
 <table>
   {{ range $v := .Usr }}
-  <tr>
+  <tr style="background-color:{{$v.MeColor}}" >
     <td><a href="/"> <img class="icon" src="{{$v.UsrImg}}" style="background-color:#{{$v.EtoColor}}" ></a></td>
     <td><img class="icon" src="/img/icon/circle_big.png"></td>
     <td>{{$v.Sum}}</td>

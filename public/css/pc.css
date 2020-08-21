@@ -6,11 +6,11 @@ body {
   width: 480px;
   float:left;
 }
-#menu_button{
-  display: none;
-}
 #menu_td{
   width: 300px;
+}
+#menu_td img{
+  display: none;
 }
 #head_menu {
   width: 790px;
