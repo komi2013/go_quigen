@@ -86,7 +86,6 @@ func Top(w http.ResponseWriter, r *http.Request) {
         }
     }
     var categoryQuestionPre []common.MCategoryQuestion
-
     rows, err = db.Query("SELECT question_id, category_id, question_title, in_list FROM m_category_question WHERE category_id in ("+whereIn2+")")
     if err != nil {
         log.Print(err)

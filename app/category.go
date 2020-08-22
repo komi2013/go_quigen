@@ -23,7 +23,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
     }
     defer db.Close()
     type BreadCrumb struct {
-        Level int
+        Level string
         CategoryID int
         CategoryName string
     }
@@ -46,6 +46,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
         CategoryName string
         CategoryDescription string
         CategoryTxt template.HTML
+        CategoryQuestion []CategoryQuestion
     }
     var view View
     view.CacheV = common.CACHE_V
@@ -61,11 +62,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Print(err)
     }
-    var tree [][2]int
-    var x [2]int
-    convert := make(map[int]string)
     treeList := map[int]map[string]string{}
-    whereIn := u[3]
     d := common.MCategoryTree{}
     for rows.Next() {
         if err := rows.Scan(&d.LeafID,&d.Level1,&d.Level2,&d.Level3,&d.Level4,&d.Level5,&d.Level6,&d.Level7,&d.Level8,&d.UpdatedAt); err != nil {
@@ -95,69 +92,79 @@ func Category(w http.ResponseWriter, r *http.Request) {
             treeList[d.Level6] = list
         }
     }
+    // var tree [][2]int
+    // var x [2]int
+    // convert := make(map[int]string)
+    whereIn := u[3]
+    forBreadCrumb := map[int]map[string]string{}
+    list := map[string]string{}
     if(d.Level1 > 0 && u[2] > "1"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level1)
-        x[0] = 1
-        x[1] = d.Level1
-        tree = append(tree, x)
-        convert[d.Level1] = ""
+        // x[0] = 1
+        // x[1] = d.Level1
+        // tree = append(tree, x)
+        
+        // convert[d.Level1] = ""
+        list = map[string]string{}
+        list["level"] = "1"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level1] = list
     }
     if(d.Level2 > 0 && u[2] > "2"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level2)
-        x[0] = 2
-        x[1] = d.Level2
-        tree = append(tree, x)
-        convert[d.Level2] = ""
+        list = map[string]string{}
+        list["level"] = "2"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level2] = list
     }
     if(d.Level3 > 0 && u[2] > "3"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level3)
-        x[0] = 3
-        x[1] = d.Level3
-        tree = append(tree, x)
-        convert[d.Level3] = ""
+        list = map[string]string{}
+        list["level"] = "3"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level3] = list
     }
     if(d.Level4 > 0 && u[2] > "4"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level4)
-        x[0] = 4
-        x[1] = d.Level4
-        tree = append(tree, x)
-        convert[d.Level4] = ""
+        list = map[string]string{}
+        list["level"] = "4"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level4] = list
     }
     if(d.Level5 > 0 && u[2] > "5"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level5)
-        x[0] = 5
-        x[1] = d.Level5
-        tree = append(tree, x)
-        convert[d.Level5] = ""
+        list = map[string]string{}
+        list["level"] = "5"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level5] = list
     }
     if(d.Level6 > 0 && u[2] > "6"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level6)
-        x[0] = 6
-        x[1] = d.Level6
-        tree = append(tree, x)
-        convert[d.Level6] = ""
+        list["level"] = "6"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level6] = list
     }
     if(d.Level7 > 0 && u[2] > "7"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level7)
-        x[0] = 7
-        x[1] = d.Level7
-        tree = append(tree, x)
-        convert[d.Level7] = ""
+        list["level"] = "7"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level7] = list
     }
     if(d.Level8 > 0 && u[2] > "8"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level8)
-        x[0] = 8
-        x[1] = d.Level8
-        tree = append(tree, x)
-        convert[d.Level8] = ""
+        list["level"] = "8"
+        list["category_name"] = ""
+        forBreadCrumb[d.Level8] = list
     }
-    whereIn2 := ""
+    whereIn2 := u[3]
 
     for i, _ := range treeList {
         whereIn2 = whereIn2 + "," + strconv.Itoa(i)
     }
-
-    rows, err = db.Query("SELECT category_id, category_name, category_description FROM m_category_name WHERE category_id in ("+whereIn+whereIn2+")")
+    fmt.Printf("whereIn %#v\n", whereIn)
+    fmt.Printf("whereIn2 %#v\n", whereIn2)
+    fmt.Printf("whereIn+whereIn2 %#v\n", whereIn+","+whereIn2)
+    rows, err = db.Query("SELECT category_id, category_name, category_description FROM m_category_name WHERE category_id in ("+whereIn+","+whereIn2+")")
     if err != nil {
         log.Print(err)
     }
@@ -166,8 +173,9 @@ func Category(w http.ResponseWriter, r *http.Request) {
         if err := rows.Scan(&r.CategoryID,&r.CategoryName,&r.CategoryDescription); err != nil {
             log.Print(err)
         }
-        if _, ok := convert[r.CategoryID]; ok {
-            convert[r.CategoryID] = r.CategoryName
+        fmt.Printf("r.CategoryID %#v\n", r.CategoryID)
+        if _, ok := forBreadCrumb[r.CategoryID]; ok {
+            forBreadCrumb[r.CategoryID]["category_name"] = r.CategoryName
         }
         if _, ok := treeList[r.CategoryID]; ok {
             treeList[r.CategoryID]["category_name"] = r.CategoryName
@@ -180,32 +188,32 @@ func Category(w http.ResponseWriter, r *http.Request) {
         // categoryName = append(categoryName, r)
         // breadCrumb[r.CategoryID]["name"] = r.CategoryName
     }
+    
     var breadCrumb []BreadCrumb
-    for _, v := range tree {
+    for i, v := range forBreadCrumb {
         y := BreadCrumb{}
-        y.Level = v[0]
-        y.CategoryID = v[1]
-        y.CategoryName = convert[v[1]]
+        y.Level = v["level"]
+        y.CategoryID = i
+        y.CategoryName = v["category_name"]
         breadCrumb = append(breadCrumb, y)
     }
     sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
-    fmt.Printf("breadCrumb %#v\n", breadCrumb)
+    
     view.BreadCrumb = breadCrumb
     
     var categoryQuestionPre []common.MCategoryQuestion
-    if whereIn2 != "" {
-        rows, err = db.Query("SELECT question_id, category_id, question_title FROM m_category_question WHERE category_id in ("+whereIn2[1:]+")")
-        if err != nil {
+    rows, err = db.Query("SELECT question_id, category_id, question_title, in_list FROM m_category_question WHERE category_id in ("+whereIn2+")")
+    if err != nil {
+        log.Print(err)
+    }
+    for rows.Next() {
+        r := common.MCategoryQuestion{}
+        if err := rows.Scan(&r.QuestionID,&r.CategoryID,&r.QuestionTitle,&r.InList); err != nil {
             log.Print(err)
         }
-        for rows.Next() {  //5,13,16,15,14
-            r := common.MCategoryQuestion{}
-            if err := rows.Scan(&r.QuestionID,&r.CategoryID,&r.QuestionTitle); err != nil {
-                log.Print(err)
-            }
-            categoryQuestionPre = append(categoryQuestionPre, r)
-        }
+        categoryQuestionPre = append(categoryQuestionPre, r)
     }
+
     var categoryList []CategoryList
     for i, v := range treeList {
         y := CategoryList{}
@@ -214,7 +222,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
         y.CategoryName = v["category_name"]
         var categoryQuestion []CategoryQuestion
         for _, v2 := range categoryQuestionPre {
-            if y.CategoryID == v2.CategoryID {
+            if y.CategoryID == v2.CategoryID && v2.InList == 1{
                 y2 := CategoryQuestion{}
                 y2.QuestionID = strconv.Itoa(v2.QuestionID)
                 y2.QuestionTitle = v2.QuestionTitle
@@ -224,25 +232,17 @@ func Category(w http.ResponseWriter, r *http.Request) {
         y.CategoryQuestion = categoryQuestion
         categoryList = append(categoryList, y)
     }
-
-    // res, _ := json.Marshal(categoryList)
-    
-    // var categoryQuestion []common.MCategoryQuestion
-    // x = common.MCategoryQuestion{}
-    // x.QuestionID = 1
-    // x.CategoryID = 1
-    // categoryQuestion = append(categoryQuestion, x)
-    // categoryQuestion = append(categoryQuestion, x)
-    // var categoryList []CategoryList
-    // y := CategoryList{}
-    // y.Level = 2
-    // y.CategoryID = 2
-    // y.CategoryName = "name"
-    // y.CategoryQuestion = categoryQuestion
-    // categoryList = append(categoryList, y)
-    // categoryList = append(categoryList, y)
+    var categoryQuestion []CategoryQuestion
+    for _, v2 := range categoryQuestionPre {
+        if strconv.Itoa(v2.CategoryID) == u[3] && v2.InList == 0 {
+            y2 := CategoryQuestion{}
+            y2.QuestionID = strconv.Itoa(v2.QuestionID)
+            y2.QuestionTitle = v2.QuestionTitle
+            categoryQuestion = append(view.CategoryQuestion, y2)
+        }
+    }
+    view.CategoryQuestion = categoryQuestion
     view.CategoryList = categoryList
-    // fmt.Printf("categoryList %#v\n", categoryList)
     tpl := template.Must(template.ParseFiles("html/category.html"))
     tpl.Execute(w, view)
 }
