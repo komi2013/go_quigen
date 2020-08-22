@@ -11,7 +11,6 @@ import (
     "strconv"
     "sort"
     "strings"
-    // "encoding/json"
 )
 
 func Category(w http.ResponseWriter, r *http.Request) {
@@ -92,19 +91,11 @@ func Category(w http.ResponseWriter, r *http.Request) {
             treeList[d.Level6] = list
         }
     }
-    // var tree [][2]int
-    // var x [2]int
-    // convert := make(map[int]string)
     whereIn := u[3]
     forBreadCrumb := map[int]map[string]string{}
     list := map[string]string{}
     if(d.Level1 > 0 && u[2] > "1"){
         whereIn = whereIn + "," + strconv.Itoa(d.Level1)
-        // x[0] = 1
-        // x[1] = d.Level1
-        // tree = append(tree, x)
-        
-        // convert[d.Level1] = ""
         list = map[string]string{}
         list["level"] = "1"
         list["category_name"] = ""
@@ -161,9 +152,6 @@ func Category(w http.ResponseWriter, r *http.Request) {
     for i, _ := range treeList {
         whereIn2 = whereIn2 + "," + strconv.Itoa(i)
     }
-    fmt.Printf("whereIn %#v\n", whereIn)
-    fmt.Printf("whereIn2 %#v\n", whereIn2)
-    fmt.Printf("whereIn+whereIn2 %#v\n", whereIn+","+whereIn2)
     rows, err = db.Query("SELECT category_id, category_name, category_description FROM m_category_name WHERE category_id in ("+whereIn+","+whereIn2+")")
     if err != nil {
         log.Print(err)
@@ -173,7 +161,6 @@ func Category(w http.ResponseWriter, r *http.Request) {
         if err := rows.Scan(&r.CategoryID,&r.CategoryName,&r.CategoryDescription); err != nil {
             log.Print(err)
         }
-        fmt.Printf("r.CategoryID %#v\n", r.CategoryID)
         if _, ok := forBreadCrumb[r.CategoryID]; ok {
             forBreadCrumb[r.CategoryID]["category_name"] = r.CategoryName
         }
@@ -185,8 +172,6 @@ func Category(w http.ResponseWriter, r *http.Request) {
             view.CategoryDescription = r.CategoryDescription
             view.CategoryTxt = template.HTML(strings.Replace(r.CategoryDescription, "\n", "<br>", -1))
         }
-        // categoryName = append(categoryName, r)
-        // breadCrumb[r.CategoryID]["name"] = r.CategoryName
     }
     
     var breadCrumb []BreadCrumb
@@ -198,9 +183,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
         breadCrumb = append(breadCrumb, y)
     }
     sort.Slice(breadCrumb, func(i, j int) bool { return breadCrumb[i].Level < breadCrumb[j].Level }) // DESC
-    
     view.BreadCrumb = breadCrumb
-    
     var categoryQuestionPre []common.MCategoryQuestion
     rows, err = db.Query("SELECT question_id, category_id, question_title, in_list FROM m_category_question WHERE category_id in ("+whereIn2+")")
     if err != nil {
