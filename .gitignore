@@ -1,5 +1,10 @@
 go
 public/img/question/*
 public/data/*
-public/content/*
 common/conf.*
+go_quigen
+infra/chromedriver
+infra/geckodriver
+infra/resource.csv
+infra/resource_en.csv
+infra/resource_en.ods
