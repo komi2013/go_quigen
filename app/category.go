@@ -7,7 +7,7 @@ import (
     "log"
     "net/http"
     "../common"
-    "fmt"
+    // "fmt"
     "strconv"
     "sort"
     "strings"
@@ -52,7 +52,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
     view.CSRF = ""
 
     u := strings.Split(r.URL.Path, "/")
-    fmt.Printf("url %#v\n", u[2])
+    
     if u[2] != "1" && u[2] != "2" && u[2] != "3" && u[2] != "4" && u[2] != "5" &&
     u[2] != "6" && u[2] != "7" && u[2] != "8" {
         return
@@ -91,6 +91,8 @@ func Category(w http.ResponseWriter, r *http.Request) {
             treeList[d.Level6] = list
         }
     }
+    delete(treeList, 0);
+    // fmt.Printf("treeList %#v\n", treeList)
     whereIn := u[3]
     forBreadCrumb := map[int]map[string]string{}
     list := map[string]string{}
