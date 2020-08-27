@@ -4,32 +4,37 @@ GRANT USAGE ON SCHEMA public TO exam_8099;
 insert into t_question
 (
 question_id, category_id, question_txt, choice_0, sound, 
-usr_id, usr_img, question_type
+usr_id, usr_img, question_type, previous_question, next_question, sequence
 )
 select question_id, category_id, resource_txt, resource_img, resource_sound, 
-3, '/data/usr/20200715/3.png', 2
-from c_resource where resource_id < 101
+3, '/data/usr/20200715/3.png', 2, previous_question, next_question, seq
+from c_resource where question_id > 340
 order by question_id ASC
--- question_id is more than 115
 
-update c_resource set question_id = question_id +1 where resource_id < 101
+insert into m_category_question
+(
+  question_id, category_id, question_title, in_list
+)
+select question_id, category_list_id, resource_txt, in_list
+from c_resource where question_id > 340
+order by question_id ASC
+
 update t_question set choice_1 = c_resource.resource_img
 from c_resource
-where t_question.question_id = c_resource.question_id
-and c_resource.resource_id < 101;
-update c_resource set question_id = question_id -3 where resource_id < 101
+where t_question.question_id = c_resource.question_id -1
+and t_question.question_id > 340;
 
 UPDATE
   c_resource AS t1
 SET
-  sequence = t2.seq
+  seq = t2.seq
 FROM (
   SELECT
     question_id,
-    ROW_NUMBER() OVER (ORDER BY question_id ASC) AS seq
+    ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY question_id ASC) AS seq
   FROM
     c_resource
-  WHERE category_id = 9
+  WHERE category_id > 25
 ) AS t2
 WHERE 
   t1.question_id = t2.question_id
