@@ -7,11 +7,11 @@ import (
     "log"
     "net/http"
     "../common"
-    "fmt"
+    // "fmt"
     "strconv"
     // "sort"
     "strings"
-    "encoding/json"
+    // "encoding/json"
 )
 
 func Top(w http.ResponseWriter, r *http.Request) {
@@ -117,8 +117,8 @@ func Top(w http.ResponseWriter, r *http.Request) {
         categoryList = append(categoryList, y)
     }
 
-    res, _ := json.Marshal(categoryList)
-    fmt.Printf("%#v\n", string(res))
+    // res, _ := json.Marshal(categoryList)
+    // fmt.Printf("%#v\n", string(res))
     var categoryQuestion []CategoryQuestion
     for _, v2 := range categoryQuestionPre {
         if v2.InList == 0 {
