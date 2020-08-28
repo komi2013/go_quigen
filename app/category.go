@@ -223,7 +223,7 @@ func Category(w http.ResponseWriter, r *http.Request) {
             y2 := CategoryQuestion{}
             y2.QuestionID = strconv.Itoa(v2.QuestionID)
             y2.QuestionTitle = v2.QuestionTitle
-            categoryQuestion = append(view.CategoryQuestion, y2)
+            categoryQuestion = append(categoryQuestion, y2)
         }
     }
     view.CategoryQuestion = categoryQuestion
