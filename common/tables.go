@@ -94,18 +94,9 @@ type TUsr struct {
 	UsrID        int       // usr_id
 	PvUID        string    // pv_u_id
 	Provider     int       // provider
-	UsrName      string    // usr_name
 	UsrImg       string    // usr_img
 	UpdatedAt    time.Time // updated_at
-	Point        int       // point
 	Introduce    string    // introduce
-	Nice         int       // nice
-	Certify      int       // certify
-	Quiz         int       // quiz
-	Forum        int       // forum
-	ForumComment int       // forum_comment
-	Latitude     float64   // latitude
-	Longitude    float64   // longitude
 	PushTokens   []byte    // push_tokens
 }
 
