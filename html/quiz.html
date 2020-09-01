@@ -243,7 +243,7 @@ function chgQtype(qType) {
 }
 if(available == 0){
   var audio = document.getElementById("audio");
-  $('a').css({ 'pointer-events': 'none' });
+  $('#content a').css({ 'pointer-events': 'none' });
   $('#app').css({ 'opacity': available });
 }
 function playing() {
@@ -251,7 +251,7 @@ function playing() {
     audio.play();
     $('#app').css({ 'opacity': 1 });
     setTimeout(function(){
-      $('a').css({ 'pointer-events': '' });
+      $('#content a').css({ 'pointer-events': '' });
       available = 1;
     },2000); 
   }
