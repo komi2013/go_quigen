@@ -90,18 +90,9 @@
 {{end}}
 {{end}}
 
-<div id="app" v-if="csrf">
-  <table><tr><td class="categoryName">新着クイズ</td></tr></table>
-  <div class="question" v-for="d,k in Question">
-    <a :href="'/quiz/?q='+d.QuestionID"> [[ d.QuestionTxt ]] </a>
-  </div>
-</div>
-
 </div>
 <br>
 <div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
-
-<script src="/js/common.js{{.CacheV}}"></script>
 
 <script>
 var csrf = '{{.CSRF}}';
@@ -128,8 +119,17 @@ function questionShow(){
 if(csrf){
 //  questionShow();
 }
-
 </script>
+
+<script src="/js/common.js{{.CacheV}}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-57298122-1');
+</script>
+
 </body>
 </html>
 

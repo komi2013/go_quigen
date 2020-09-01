@@ -137,8 +137,14 @@ function toList(){
 
 </script>
 
-<script defer src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
-<script defer src="/js/common.js{{.CacheV}}"></script>
+<script src="/js/common.js{{.CacheV}}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-57298122-1');
+</script>
 
 </body>
 </html>

@@ -119,17 +119,6 @@ func Top(w http.ResponseWriter, r *http.Request) {
 
     // res, _ := json.Marshal(categoryList)
     // fmt.Printf("%#v\n", string(res))
-    var categoryQuestion []CategoryQuestion
-    for _, v2 := range categoryQuestionPre {
-        if v2.InList == 0 {
-            y2 := CategoryQuestion{}
-            y2.QuestionID = strconv.Itoa(v2.QuestionID)
-            y2.QuestionTitle = v2.QuestionTitle
-            categoryQuestion = append(categoryQuestion, y2)
-        }
-    }
-    
-    view.CategoryQuestion = categoryQuestion
     
     // var categoryQuestion []common.MCategoryQuestion
     // x = common.MCategoryQuestion{}
