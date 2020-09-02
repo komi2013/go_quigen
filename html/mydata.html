@@ -11,12 +11,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no" >
   </head>
 <style>
-.graph_frame {
-  position: absolute;
-  height: 30px;
-  width: 100%;
-  border-bottom: 1px solid #F5F5F5;
-}
+
 .graph_date {
   width: 60%;
   display: inline-block;
@@ -32,6 +27,22 @@
 .graph_bar {
   background-color: #bfd8e4;
   height: 30px;
+}
+@media screen and (min-width:711px) { 
+  .graph_frame {
+    position: absolute;
+    height: 30px;
+    width: 480px;
+    border-bottom: 1px solid #F5F5F5;
+  }
+}
+@media screen and ( max-width:710px) {
+  .graph_frame {
+    position: absolute;
+    height: 30px;
+    width: 100%;
+    border-bottom: 1px solid #F5F5F5;
+  }
 }
 </style>
 <body>
