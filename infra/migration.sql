@@ -75,3 +75,11 @@ WHERE sequence < 16 AND sequence > 5
 INSERT INTO m_category_tree (leaf_id, level_1, updated_at)
 SELECT category_id, category_id, '2020-08-29 18:24:00'
 FROM m_category_question
+
+UPDATE
+  m_category_name AS t1
+SET
+  category_description = t2.description
+FROM mt_seo_tag AS t2
+WHERE 
+  t1.category_name = t2.tag
