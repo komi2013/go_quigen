@@ -12,10 +12,6 @@ body {
 #menu_td img{
   display: none;
 }
-#head_menu {
-  width: 790px;
-  height: 50px;
-}
 #drawer {
   position : absolute;
   float : left;
@@ -24,14 +20,11 @@ body {
   background-color: white;
 }
 
-.ad_frame_right {
-  position : fixed;
-  margin: 0px 0px 0px 10px; 
-}
 .pc_disp_none{
   display: none;
 }
-.right_ad{
-    position:absolute;
-    left:1000px;
+#ad_right{
+  position:absolute;
+  left:1000px;
+  top:50px;
 }
