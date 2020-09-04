@@ -48,6 +48,13 @@ func Top(w http.ResponseWriter, r *http.Request) {
     var view View
     view.CacheV = common.CACHE_V
     view.CSRF = common.MakeCSRF(w,r)
+
+    if r.URL.Path != "/" {
+        log.Print(r.URL.Path)
+        http.NotFound(w, r)
+        return
+    }
+
     rows, err := db.Query("SELECT level_1 FROM m_category_tree GROUP BY level_1")
     if err != nil {
         log.Print(err)

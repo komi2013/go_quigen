@@ -25,7 +25,11 @@ func main() {
     http.HandleFunc("/NewQuestionShow/", app.NewQuestionShow)
     http.HandleFunc("/quiz/", app.Quiz)
     http.HandleFunc("/rank/", app.Rank)
+    http.HandleFunc("/search/", app.Search)
+
+
     http.HandleFunc("/", app.Top)
     fmt.Println("starting.." + common.CACHE_V)
+    fmt.Println(common.DB_CONNECT)
     log.Fatal(http.ListenAndServe(common.GO_PORT, nil))
 }
