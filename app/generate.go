@@ -1,11 +1,13 @@
 package app
 
 import (
-    "fmt"
+    // "fmt"
     "html/template"
-    // "log"
+    "database/sql"
+    _ "github.com/lib/pq"
+    "log"
     "net/http"
-    "time"
+    // "time"
     "../common"
     // "./app"
     // "crypto/aes"
@@ -13,20 +15,38 @@ import (
 
 func Generate(w http.ResponseWriter, r *http.Request) {
 
-
-    m := map[string]string{
-        "cache_v": common.CACHE_V,
-        "csrf": common.MakeCSRF(w,r),
-        "Time": time.Now().Format("15:04:05"),
-        "Testt": "near",
+	connStr := common.DB_CONNECT
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Print(err)
     }
-    cookie, err := r.Cookie("xsssr")
-    value := ""
-    if err == nil {
-        value = cookie.Value
-	}
-    // fmt.Println("koutei")
-    fmt.Printf("%#v\n", value)
+    defer db.Close()
+    var cat string
+    cookie, err := r.Cookie("cat")
+    if err != nil {
+		cat = "0"
+    } else {
+        cat = cookie.Value
+    }
+    
+    query := "SELECT category_name FROM m_category_name WHERE category_id = $1"
+    rows, err := db.Query(query, cat)
+    if err != nil {
+        log.Print(query)
+        log.Print(r.FormValue("q"))
+        log.Print(err)
+    }
+    category_name := ""
+    for rows.Next() {
+        if err := rows.Scan(&category_name); err != nil {
+            log.Print(err)
+        }
+    }
+    m := map[string]string{
+        "CacheV": common.CACHE_V,
+        "CSRF": common.MakeCSRF(w,r),
+        "CategoryName": category_name,
+    }
     tpl := template.Must(template.ParseFiles("html/generate.html"))
     tpl.Execute(w, m)
 }

@@ -37,7 +37,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) int {
 	usr_id := 0
     cookie, err := r.Cookie("ss")
     if err != nil {
-		log.Print("No ss Cookie: ", err)
 		return 0
 	}
 	ss := Decrypt(SS_KEY,cookie.Value)

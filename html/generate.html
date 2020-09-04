@@ -96,8 +96,8 @@
   </tr>
 </table>
 
-<table style="width:96%;">
-  <tr><td class="tag">#<input type="text" placeholder="category" maxlength="12" id="tag_0"></td></tr>
+<table style="width:100%;text-align:center;">
+  <tr><td>{{.CategoryName}}</td></tr>
 </table>
 
 <table style="width:100%;text-align:center;">
@@ -134,13 +134,11 @@
 
 <script>
 var u_id = '';
-var csrf = '{{.csrf}}';
+var csrf = '{{.CSRF}}';
 </script>
 
 <script>
-if(localStorage.last_tag){
-  $('#tag_0').val( localStorage.last_tag.replace(/#/,'') );
-}
+
 $('#generate').click(function(){
   var validate = 1;
   if($('#q_txt').val()==''){
@@ -152,7 +150,7 @@ $('#generate').click(function(){
       $('#choice_'+i).css({'border-color':'red'});
       validate=2;
     }
-  }      
+  }
   if(validate==2){
     return;
   }

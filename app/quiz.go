@@ -7,7 +7,7 @@ import (
     "log"
     "net/http"
     "../common"
-    // "fmt"
+    "fmt"
     "strconv"
     "sort"
     "strings"
@@ -45,15 +45,17 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     var view View
     view.CacheV = common.CACHE_V
     view.CSRF = common.MakeCSRF(w,r)
-    // view.PleaseClick = common.PLEASE_CLICK
     u_id := common.GetUser(w,r)
     eto := common.Eto(u_id)
     view.Myphoto = eto[0]
     view.EtoColor = eto[1]
-
-    rows, err := db.Query("SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence,sound,explanation from t_question WHERE question_id = $1", r.FormValue("q"))
+    var query string
+    query = "SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence,sound,explanation from t_question WHERE question_id = $1"
+    rows, err := db.Query(query, r.FormValue("q"))
     if err != nil {
-        log.Print(err)
+        fmt.Println(query)
+        fmt.Println(r.FormValue("q"))
+        fmt.Println(err)
     }
     var question common.TQuestion
     for rows.Next() {

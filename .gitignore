@@ -8,3 +8,4 @@ infra/geckodriver
 infra/resource.csv
 infra/resource_en.csv
 infra/resource_en.ods
+log*
