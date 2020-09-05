@@ -7,13 +7,9 @@ import (
     "log"
     "net/http"
     "../common"
-    // "encoding/json"
-    // "encoding/base64"
-    // "os"
-    // "strings"
     "time"
-    // "strconv"
-    // "../table"
+    "net/smtp"
+    "encoding/base64"
 )
 
 func CommentAdd(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +35,49 @@ func CommentAdd(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Print(err)
     }
+
+	// Connect to the remote SMTP server.
+	c, err := smtp.Dial("localhost:25")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Set the sender and recipient first
+	if err := c.Mail("sender@quigen.info"); err != nil {
+		log.Fatal(err)
+	}
+	if err := c.Rcpt("seijirok@infoseek.jp"); err != nil {
+		log.Fatal(err)
+	}
+
+	// Send the email body.
+	wc, err := c.Data()
+	if err != nil {
+		log.Fatal(err)
+    }
+    //" + strings.Join(to, ",") + "
+    msg := "To: seiijrok@infoseek.jp \r\n" +
+		"From: sender@quigen.info \r\n" +
+		"Subject: you got comment \r\n" +
+		"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
+		"Content-Transfer-Encoding: base64\r\n" +
+		"\r\n" + base64.StdEncoding.EncodeToString([]byte("somebody commented"))
+    // _, err = fmt.Fprintf(wc, "This is the email body")
+    _, err = wc.Write([]byte(msg))
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = wc.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Send the QUIT command and close the connection.
+	err = c.Quit()
+	if err != nil {
+		log.Fatal(err)
+	}
+
     fmt.Fprint(w, `{"Status":"1"}`)
 
 }

@@ -53,28 +53,6 @@ func Message(w http.ResponseWriter, r *http.Request) {
   uri := strings.Split(r.URL.Path, "/")
   fmt.Printf("url %#v\n", uri[2])
 
-  // var msgList MsgList
-  k1 := map[string][]map[string]string{}
-  // arr := []map[string]string{}
-  map1 := map[string]string{}
-  map1["test1"] = "mada"
-  map1["test2"] = "mada2"
-  k1["1"] = append(k1["1"], map1)
-  fmt.Printf("k1 %#v\n", k1)
-  map1 = map[string]string{}
-  map1["test1"] = "mada3"
-  map1["test2"] = "mada4"
-  k1["1"] = append(k1["1"], map1)
-  // k1["1"] = append(k1["1"], map1)
-  // k1["1"] = arr
-  // k["SenderFlg"] = "message_content"
-  // s := map[string]map[string]string{}
-  // s["2"] = k
-  // usrMap1 := map[string]map[string]map[string]string{}
-  // usrMap1["1"] = s
-
-  // fmt.Printf("usrMap1 %#v\n", usrMap1)
-  // return
   t := time.Now()
   t1 := t.AddDate(0, -1, 0)
   time.Now().Format("2006-01-02 15:04:05")
