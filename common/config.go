@@ -1,6 +1,6 @@
 package common
 
-const GO_PORT  = ":8101"
+const GO_PORT  = ":8100"
 const CACHE_V  = "?dev20200901"
 const SS_KEY   = "11111111111111111111111111111111"
 const T1_KEY   = "11111111111111111111111111111111"

@@ -58,6 +58,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         fmt.Println(err)
     }
     var question common.TQuestion
+    nothing := true
     for rows.Next() {
         r := common.TQuestion{}
         if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation); err != nil {
@@ -70,8 +71,13 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
             view.Available = 1
         }
         question = r
+        nothing = false
     }
-    
+    if nothing {
+        fmt.Println("?q=" + r.FormValue("q"))
+        http.NotFound(w, r)
+        return
+    }
     txt := []rune(question.QuestionTxt)
     txtLen := len(txt)
     titleLen := 32

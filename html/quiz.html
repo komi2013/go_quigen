@@ -188,8 +188,16 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 {{ end }}
 
 <table><tr>
-  <td style="height:50px;font-size:30px;"><a href="/quiz/?q={{.Q.PreviousQuestion}}"> < </a></td>
-  <td style="height:50px;font-size:30px;"><a href="/quiz/?q={{.Q.NextQuestion}}" id="nextQ" > > </a></td>
+  <td style="height:50px;font-size:30px;width:50%;">
+    {{ if ne .Q.PreviousQuestion 0 }}
+      <a href="/quiz/?q={{.Q.PreviousQuestion}}"> < </a>
+    {{ end }}
+  </td>
+  <td style="height:50px;font-size:30px;width:50%;">
+    {{ if ne .Q.NextQuestion 0 }}
+      <a href="/quiz/?q={{.Q.NextQuestion}}" id="nextQ" > > </a>
+    {{ end }}
+  </td>
 </tr></table>
 
 </div>
@@ -384,7 +392,7 @@ function UIeffect(correct){
   }
   app.AnswerCalc[0] = Math.round(correctAmount / app.AnswerCalc[1] * 100);
   setTimeout(function(){
-    if($('#nextQ').attr('href') != '/quiz/?q=0'){
+    if($('#nextQ').attr('href') && $('#nextQ').attr('href') != '/quiz/?q=0'){
       location.href = $('#nextQ').attr('href');
     }
   },200);
