@@ -95,20 +95,15 @@ func AnswerShow(w http.ResponseWriter, r *http.Request) {
         IncorrectUsr [16][2]string
         AnswerCalc   [2]float64
         Comment      []common.TComment
+        CSRF         string
     }
     var arr Arr
-    // arr = &Arr{  //pointer but not necessary
-    //     Status: 1,
-    //     CorrectUsr: correctUsr,
-    //     IncorrectUsr: incorrectUsr,
-    //     AnswerCalc: answerCalc,
-    //     Comment: comment,
-    // }
     arr.Status = 1
     arr.CorrectUsr = correctUsr
     arr.IncorrectUsr = incorrectUsr
     arr.AnswerCalc = answerCalc
     arr.Comment = comment
+    arr.CSRF = common.MakeCSRF(w,r)
     res, _ := json.Marshal(arr)
     fmt.Fprint(w, string(res))
 }

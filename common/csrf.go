@@ -5,52 +5,44 @@ import (
 	"time"
 	"net/http"
 	"log"
+	"github.com/catinello/base62"
+	// "strconv"
 )
 
 func MakeCSRF(w http.ResponseWriter, r *http.Request) string {
-	txt := time.Now().Format("2006-01-02 15:04:05")
-	txt = Encrypt(CSRF_KEY,txt)
-	cookie1 := &http.Cookie{
+	u62 := base62.Encode( int(time.Now().Unix()) )
+	page := Encrypt(CSRF_KEY,u62)
+	cookie := &http.Cookie{
 		Name: "xr",
-		Value: txt,
+		Value: u62,
 		Path: "/",
 		MaxAge: 120,
 		Secure: true,
 		HttpOnly: true,
     }
-	http.SetCookie(w, cookie1)
-	txt = StringRand(6)
-	cookie2 := &http.Cookie{
-		Name: "csrf",
-		Value: txt,
-		Path: "/",
-		MaxAge: 120,
-		Secure: true,
-		HttpOnly: true,
-    }
-	http.SetCookie(w, cookie2)
-	return txt
+	http.SetCookie(w, cookie)
+	return page
 }
 
-func CheckCSRF(r *http.Request, txt string) bool {
+func CheckCSRF(r *http.Request, page string) bool {
     cookie, err := r.Cookie("xr")
-    value := ""
+    u62 := ""
     if err == nil {
-        value = cookie.Value
+        u62 = cookie.Value
 	}
-	xr := Decrypt(CSRF_KEY,value)
-
-	csrf, _ := time.Parse("2006-01-02 15:04:05", xr)
-	t_add := csrf.Add(2 * time.Hour)
-
-	cookie, err = r.Cookie("csrf")
-    if err == nil {
-        value = cookie.Value
+	if Decrypt(CSRF_KEY,page) != u62 || u62 == "" {
+		log.Print("CSRF page cookie is not match")
+		return false
 	}
-
-	if txt != value || time.Now().After(t_add) {
-		 log.Print("CSRF value different or time expired")
-		 return false
+	n, err := base62.Decode(u62)
+    if err != nil {
+		log.Print(err)
+	}
+    tm := time.Unix(int64(n), 0)
+	t_add := tm.Add(2 * time.Hour)
+	if time.Now().After(t_add) {
+		log.Print("CSRF is expired")
+		return false
 	}
 	return true
 }

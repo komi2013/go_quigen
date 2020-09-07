@@ -95,7 +95,7 @@ WHERE
   t1.category_name = t2.tag
 
 INSERT INTO m_category_question (
-  question_id, category_id, updated_at, question_title, in_list)
+  question_id, category_id, updated_at, SUBSTR(question_title, 0 , 60), in_list)
 SELECT question_id, category_id, '2020-09-05 09:14:00', question_txt, 1
 FROM t_question
 WHERE sequence = 1

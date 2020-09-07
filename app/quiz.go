@@ -49,6 +49,11 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     eto := common.Eto(u_id)
     view.Myphoto = eto[0]
     view.EtoColor = eto[1]
+    if r.FormValue("q") == "" {
+        fmt.Println(r.URL.Path)
+        http.NotFound(w, r)
+        return
+    }
     var query string
     query = "SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence,sound,explanation from t_question WHERE question_id = $1"
     rows, err := db.Query(query, r.FormValue("q"))

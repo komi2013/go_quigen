@@ -4,7 +4,7 @@ import (
     "net/http"
     "html/template"
     // "github.com/garyburd/redigo/redis"
-    "fmt"
+    // "fmt"
     // "os"
     // "log"
     // "time"
@@ -28,7 +28,6 @@ func Htm(w http.ResponseWriter, r *http.Request) {
     eto := common.Eto(u_id)
     view.Myphoto = eto[0]
     view.EtoColor = eto[1]
-    fmt.Printf("eto %#v\n", eto)
     uri := strings.Split(r.URL.String(), "/")
     tpl := template.Must(template.ParseFiles("html/htm/"+uri[2]+".html"))
     tpl.Execute(w, view)
