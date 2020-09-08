@@ -228,10 +228,16 @@ function shuffle(array) {
 }
 var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
 var qi = -1;
+var localNextQ = 0;
+var lq = 0;
 for(var i = 0; i < localQ.length; i++){
   if(localQ[i][0] == q_id){
     qi = i;
   }
+  if(localQ[i][0] == q_id){
+    localNextQ = lq
+  }
+  lq = localQ[i][0];
 }
 
 function chgQtype(qType) {
@@ -309,15 +315,14 @@ var app = new Vue({
             app.choices[i][2] = 'opacity:0.2;';
           }
         }
-        //if(correct == 0){
-        //  app.choices[choiced][2] = 'background-color: red;';
-        //}
         UIeffect(correct);
       },1000);
-      saveLocal(correct);
       if(qi == -1){
-        posting(correct);
+        posting(correct,0);
+      }else if(correct - localQ[qi][6] == 1){
+        posting(correct,1);
       }
+      saveLocal(correct);
     },
     describe: function (e) {
       if(available != 1){
@@ -331,10 +336,12 @@ var app = new Vue({
       setTimeout(function(){
         UIeffect(correct);
       },1000);
-      saveLocal(correct);
       if(qi == -1){
-        posting(correct);
+        posting(correct,0);
+      }else if(correct - localQ[qi][6] == 1){
+        posting(correct,1);
       }
+      saveLocal(correct);
     },
     commenting: function (k) {
       var param = {
@@ -377,8 +384,7 @@ answerShow();
 
 var audio_correct = document.getElementById("audio_correct");
 var audio_incorrect = document.getElementById("audio_incorrect");
-function UIeffect(correct){
-  
+function UIeffect(correct){  
   var correctAmount = app.AnswerCalc[0] * app.AnswerCalc[1] / 100;
   app.AnswerCalc[1]++;
   if(correct == 1){
@@ -393,10 +399,12 @@ function UIeffect(correct){
   }
   app.AnswerCalc[0] = Math.round(correctAmount / app.AnswerCalc[1] * 100);
   setTimeout(function(){
-    if($('#nextQ').attr('href') && $('#nextQ').attr('href') != '/quiz/?q=0'){
+    if(localNextQ > 0){
+      location.href = '/quiz/?q='+localNextQ;
+    }else if($('#nextQ').attr('href') && $('#nextQ').attr('href') != '/quiz/?q=0'){
       location.href = $('#nextQ').attr('href');
     }
-  },200);
+  },1000);
 }
 function saveLocal(correct){
   var arrQ = [
@@ -436,7 +444,7 @@ function saveLocal(correct){
   }
   localStorage.daily = JSON.stringify(daily);
 }
-function posting(correct){
+function posting(correct,update){
   $.cookie('cat','{{.Q.CategoryID}}',{expires:7, path:'/'});
   var param = {
     csrf           : csrf
@@ -445,6 +453,7 @@ function posting(correct){
     ,category_id   : '{{.Q.CategoryID}}'
     ,respondent_img: etoColor ? '' : myphoto
     ,correct : correct
+    ,update : update
   };
   $.post('/Answer/',param,function(){},"json")
   .always(function(res){});

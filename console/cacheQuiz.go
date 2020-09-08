@@ -7,6 +7,7 @@ import (
   _ "github.com/lib/pq"
   "../common"
   // "io/ioutil"
+  "time"
 )
 
 func CacheQuiz() {
@@ -17,18 +18,21 @@ func CacheQuiz() {
   }
   defer db.Close()
   var query string
-  query = "SELECT question_id FROM t_question  ORDER BY question_id"
+  query = "SELECT question_id FROM t_question WHERE question_id > 7752 ORDER BY question_id"
   rows, err := db.Query(query)
   if err != nil {
       fmt.Println(err)
   }
-  
+  timeout := time.Duration(60 * time.Second)
+  client := http.Client{
+    Timeout: timeout,
+  }
   for rows.Next() {
     var question_id string
     if err := rows.Scan(&question_id); err != nil {
       fmt.Println(err)
     }
-    resp, err := http.Get("https://shikaku.quigen.info/quiz/?q="+question_id)
+    resp, err := client.Get("https://shikaku.quigen.info/quiz/?q="+question_id)
     if err != nil {
       fmt.Println(err)
     }

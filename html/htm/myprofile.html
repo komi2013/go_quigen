@@ -15,7 +15,6 @@
   width: 99%;
   padding: 20px 0px 19px 0px;
   word-break: break-word;
-  border-bottom: 1px solid #F5F5F5;
 }
 div a {
   display: block;
@@ -60,10 +59,10 @@ div a {
 
 <template v-for="d,k in q">
   <div class="question">
-    <a :href="'/quiz/?q='+d[0]"> <img class="icon" :src="d[5]"> <span v-html="d[1]"> </span> </a>
+    <a :href="'/quiz/?q='+d[0]"> <span v-html="d[1]"> </span> </a>
   </div>
-  <table><tr>
-    <td @click="del(k)"> <img class="icon" src="/img/icon/no_internet.png"> </td>
+  <table style="border-bottom: 1px solid #F5F5F5;"><tr>
+    <td> <img class="icon" :src="d[6]"> </td>
     <td @click="del(k)"> <img class="icon" src="/img/icon/trash.png"> </td>
   </tr></table>
 </template>
@@ -104,6 +103,11 @@ for (var i=0; app.q.length > i; i++) {
     cutLen = -1 * cutLen;
     console.log(cutLen);
     app.q[i][1] = q1.slice(0,cutLen);
+  }
+  if(app.q[i][6] == 1){
+    app.q[i][6] = '/img/icon/circle_big.png';
+  }else{
+    app.q[i][6] = '/img/icon/cross_big.png';
   }
   app.$set(app.q,i,app.q[i]);
 }

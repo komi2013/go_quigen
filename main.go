@@ -8,11 +8,11 @@ import (
     // "time"
     "./app"
     "./common"
-    "./console"
+    // "./console"
 )
 
 func main() {
-    console.CacheQuiz()
+    // console.CacheQuiz()
     http.HandleFunc("/advertisement/", app.Advertisement)
     http.HandleFunc("/Answer/", app.Answer)
     http.HandleFunc("/AnswerShow/", app.AnswerShow)
