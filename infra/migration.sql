@@ -61,7 +61,7 @@ SET
 FROM (
   SELECT
     question_id,
-    lag(question_id,1,0) OVER(PARTITION BY category_id ORDER BY question_id ) AS diff
+    lag(question_id,1,0) OVER(PARTITION BY category_id ORDER BY updated_at ) AS diff
   FROM
     t_question
 ) AS t2
@@ -75,7 +75,7 @@ SET
 FROM (
   SELECT
     question_id,
-    ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY question_id ASC) AS seq
+    ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY updated_at ASC) AS seq
   FROM
     t_question
 ) AS t2
