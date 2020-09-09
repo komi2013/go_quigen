@@ -51,17 +51,17 @@ func Message(w http.ResponseWriter, r *http.Request) {
   view.EtoColor = eto[1]
   view.Opponent = "0"
   uri := strings.Split(r.URL.Path, "/")
-  fmt.Printf("url %#v\n", uri[2])
+  
 
   t := time.Now()
   t1 := t.AddDate(0, -1, 0)
   time.Now().Format("2006-01-02 15:04:05")
-  rows, err := db.Query("SELECT "+
-    "sender,receiver,sender_img,message_content,message_id,created_at "+
-    "FROM t_message                     "+
-    "WHERE created_at > $1              "+
-    "AND (sender = $2 OR receiver = $2) "+
-    "ORDER BY created_at DESC ", 
+  rows, err := db.Query(`SELECT 
+    sender,receiver,sender_img,message_content,message_id,created_at 
+    FROM t_message                     
+    WHERE created_at > $1              
+    AND (sender = $2 OR receiver = $2) 
+    ORDER BY created_at DESC `,
     t1.Format("2006-01-02 15:04:05"), u_id)
   if err != nil {
       log.Print(err)
@@ -91,6 +91,30 @@ func Message(w http.ResponseWriter, r *http.Request) {
         usrMap[sender] = append(usrMap[sender], d)
       }
   }
+  rows, err = db.Query(`SELECT 
+    sender,sender_img,public_content,updated_at 
+    FROM m_public_message                             
+    ORDER BY updated_at DESC `)
+  if err != nil {
+      log.Print(err)
+  }
+  for rows.Next() {
+    var sender int
+    var sender_img string
+    var public_content string
+    var updated_at string
+    if err := rows.Scan(&sender,&sender_img,&public_content,&updated_at); err != nil {
+        log.Print(err)
+    }
+    d := map[string]string{}
+    d["Txt"] = html.EscapeString(public_content)
+    d["OpponentImg"] = sender_img
+    d["CreatedAt"] = updated_at
+    d["SenderFlg"] = "0"
+    usrMap[sender] = append(usrMap[sender], d)
+  }
+  // res2, _ := json.Marshal(usrMap)
+  // fmt.Printf("usrMap %#v\n", string(res2))
   if uri[2] != "" {
     view.Opponent = uri[2]
     op, err := strconv.Atoi(uri[2])
@@ -104,7 +128,6 @@ func Message(w http.ResponseWriter, r *http.Request) {
     }
     usrMap[op] = append(usrMap[op], map[string]string{})
   }
-  
   var msgList []MsgList
   for i, v := range usrMap {
     var msg []Msg

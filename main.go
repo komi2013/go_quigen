@@ -16,6 +16,7 @@ func main() {
     http.HandleFunc("/advertisement/", app.Advertisement)
     http.HandleFunc("/Answer/", app.Answer)
     http.HandleFunc("/AnswerShow/", app.AnswerShow)
+    http.HandleFunc("/auth/", app.Auth)
     http.HandleFunc("/category/", app.Category)
     http.HandleFunc("/CommentAdd/", app.CommentAdd)
     http.HandleFunc("/generate/", app.Generate)
@@ -28,7 +29,6 @@ func main() {
     http.HandleFunc("/quiz/", app.Quiz)
     http.HandleFunc("/rank/", app.Rank)
     http.HandleFunc("/search/", app.Search)
-
 
     http.HandleFunc("/", app.Top)
     fmt.Println("starting.." + common.CACHE_V)
