@@ -17,7 +17,7 @@ import (
 )
 
 func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
-    usr_id := 1
+
     ok := common.CheckCSRF(r,r.FormValue("csrf"))
     if !ok {
         fmt.Fprint(w, `["2","CSRF Error"]`)
@@ -50,7 +50,14 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
         defer file.Close()
         file.Write(data)
     }
-
+    var cat string
+    cookie, err := r.Cookie("cat")
+    if err != nil {
+        log.Print(err)
+        cat = "0"
+	} else {
+        cat = cookie.Value
+    }
     _, err = db.Exec(`INSERT INTO t_question(
         question_id,
         question_txt,
@@ -71,13 +78,13 @@ func GenerateQuiz(w http.ResponseWriter, r *http.Request) {
         r.FormValue("choice_2"),
         r.FormValue("choice_3"),
         img,
-        0,
+        cat,
         r.FormValue("reference"),
-        usr_id,
-        r.FormValue("myphoto"))
+        3, //usr_id,
+        "/data/usr/20200715/3.png") //r.FormValue("myphoto")
     if err != nil {
         log.Print(err)
     }
-    fmt.Fprint(w, `["1"]`)
+    fmt.Fprint(w, `[1,`+strconv.Itoa(question_id)+`]`)
 
 }

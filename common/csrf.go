@@ -16,7 +16,7 @@ func MakeCSRF(w http.ResponseWriter, r *http.Request) string {
 		Name: "xr",
 		Value: u62,
 		Path: "/",
-		MaxAge: 120,
+		MaxAge: 0,
 		Secure: true,
 		HttpOnly: true,
     }

@@ -184,7 +184,9 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 </div>
 
 {{ if .Q.Reference }}
-<div style="word-wrap:break-word;" id="reference">reference: {{.Q.Reference}}</div>
+<blockquote cite="{{.Q.Reference}}">
+" <a href="{{.Q.Reference}}" target="_blank" id="reference">{{.Q.Reference}}</a> "
+</blockquote>
 {{ end }}
 
 <table><tr>
