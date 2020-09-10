@@ -61,12 +61,11 @@ SET
 FROM (
   SELECT
     question_id,
-    lag(question_id,1,0) OVER(PARTITION BY category_id ORDER BY updated_at ) AS diff
+    lag(question_id,1,0) OVER(PARTITION BY category_id ORDER BY question_id ) AS diff
   FROM
     t_question
 ) AS t2
-WHERE 
-  t1.question_id = t2.question_id
+WHERE t1.question_id = t2.question_id
 
 UPDATE
   t_question AS t1
@@ -75,12 +74,11 @@ SET
 FROM (
   SELECT
     question_id,
-    ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY updated_at ASC) AS seq
+    ROW_NUMBER() OVER (PARTITION BY category_id ORDER BY question_id ASC) AS seq
   FROM
     t_question
 ) AS t2
-WHERE 
-  t1.question_id = t2.question_id
+WHERE t1.question_id = t2.question_id
 
 INSERT INTO m_category_tree (leaf_id, level_1, updated_at)
 SELECT category_id, category_id, '2020-09-05 09:30:00'

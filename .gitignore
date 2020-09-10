@@ -1,11 +1,7 @@
 go
-public/img/question/*
 public/data/*
 common/conf.*
 go_quigen
 infra/chromedriver
 infra/geckodriver
-infra/resource.csv
-infra/resource_en.csv
-infra/resource_en.ods
-log*
+log/*

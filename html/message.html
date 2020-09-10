@@ -56,7 +56,7 @@
 <table v-if="opponent == 0">
   <tr v-for="(d,k) in msgList" style="border-bottom: 1px solid white;">
     <td style="width:50px;"><a href="/"> <img class="icon" :src="d.OpponentImg" :style="'background-color:#'+d.OpponentColor" ></a></td>
-    <td style="text-align:left;" v-html="d.Msg[d.Msg.length -1].Txt" @click="openMsg(d.OpponentID)"></td>
+    <td style="text-align:left;" v-html="d.Msg[d.Msg.length -1].Txt.substring(0,40)" @click="openMsg(d.OpponentID)"></td>
   </tr>
 </table>
 
