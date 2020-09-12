@@ -6,14 +6,8 @@ from selenium import webdriver
 driver = webdriver.Chrome(executable_path='/Project/go_quigen/infra/chromedriver')
 driver.get('https://soundoftext.com/')
 sources = [
-'жираф'
-,'белка летяга'
-,'крот'
-,'Дельфин'
-,'салат'
-,'Эвглена зелёная'
-,'Инфузория туфелька'
-,'Скат'
+'ぎゅうにく'
+,'とりにく'
 ]
 time.sleep(10)
 for d in sources:

@@ -438,6 +438,14 @@ ALTER TABLE ONLY public.m_category_tree
 
 
 --
+-- Name: m_public_message m_public_message_public_message_id; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.m_public_message
+    ADD CONSTRAINT m_public_message_public_message_id PRIMARY KEY (public_message_id);
+
+
+--
 -- Name: t_comment t_comment_comment_id; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
