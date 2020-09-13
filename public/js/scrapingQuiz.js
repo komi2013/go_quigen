@@ -18,34 +18,38 @@ if ( $('#select_a').html() ) {
   arr.push($('#select_u').html());
   arr.push($('#select_e').html());
 } else {
-  console.log(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[3]/ul/li/ul/li[1]/a/button').firstChild.nodeValue);
-  arr.push(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[4]/ul/li/ul/li[1]/a/button').firstChild.nodeValue);
-  arr.push(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[4]/ul/li/ul/li[2]/a/button').firstChild.nodeValue);
-  arr.push(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[4]/ul/li/ul/li[3]/a/button').firstChild.nodeValue);
-  arr.push(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[4]/ul/li/ul/li[4]/a/button').firstChild.nodeValue);
+  arr.push("");
+  arr.push("");
+  arr.push("");
+  arr.push("");
 }
-
-
 
 arr.push($('#answerChar').html());
-if ($('.ansbg')[1]) {
-  console.log($('.ansbg')[1].html());
-  // arr.push($('.ansbg')[0].html());
+// console.log($('#kaisetsu div').eq(-0).html());
+if ($('#kaisetsu div') && $('#kaisetsu div').eq(-0)) {
+  // console.log(document.getElementsByXPath('//*[@id="kaisetsu"]/div[1]')[0].firstChild.nodeValue);
+  arr.push($('#kaisetsu div').eq(-0).html());
 
 }
+
 
 var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
 localQ.unshift(arr);
 localStorage.q = JSON.stringify(localQ);
 
+// $('.submit').click();
+
 let csvContent = "data:text/csv;charset=utf-8,";
-// rows.forEach(function(rowArray) {
-//   let row = rowArray.join(",");
-//   csvContent += row + "\r\n";
-// });
+localQ.forEach(function(rowArray) {
+  let row = rowArray.join(",");
+  csvContent += row + "\r\n";
+});
 
 // console.log(arr);
 // console.log(csvContent);
-// var encodedUri = encodeURI(csvContent);
-// window.open(encodedUri);
+var encodedUri = encodeURI(csvContent);
+window.open(encodedUri);
 // console.log(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[1]/div/img')[0].src);
+
+// 平成25年春期　問1
+// 平成31年春期　問3
