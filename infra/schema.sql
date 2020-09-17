@@ -21,6 +21,70 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: t_question; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.t_question (
+    question_id integer NOT NULL,
+    question_txt text DEFAULT ''::text NOT NULL,
+    usr_id integer DEFAULT 0 NOT NULL,
+    usr_img text DEFAULT ''::text NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    choice_0 text DEFAULT ''::text NOT NULL,
+    choice_1 text DEFAULT ''::text NOT NULL,
+    choice_2 text DEFAULT ''::text NOT NULL,
+    choice_3 text DEFAULT ''::text NOT NULL,
+    reference text DEFAULT ''::text NOT NULL,
+    question_type smallint DEFAULT '0'::smallint NOT NULL,
+    category_id integer DEFAULT 0 NOT NULL,
+    question_img text DEFAULT ''::text NOT NULL,
+    previous_question integer DEFAULT 0 NOT NULL,
+    next_question integer DEFAULT 0 NOT NULL,
+    sequence integer DEFAULT 0 NOT NULL,
+    sound text DEFAULT ''::text NOT NULL,
+    explanation text DEFAULT ''::text NOT NULL
+);
+
+
+ALTER TABLE public.t_question OWNER TO postgres;
+
+--
+-- Name: COLUMN t_question.question_type; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.t_question.question_type IS '0=choice, 1=text, 2=picture';
+
+
+--
+-- Name: COLUMN t_question.sequence; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.t_question.sequence IS 'within leaf category';
+
+
+--
+-- Name: t_question_question_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.t_question_question_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.t_question_question_id_seq OWNER TO postgres;
+
+--
+-- Name: t_question_question_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.t_question_question_id_seq OWNED BY public.t_question.question_id;
+
+
+--
 -- Name: c_resource; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -29,12 +93,17 @@ CREATE TABLE public.c_resource (
     resource_img text DEFAULT ''::text NOT NULL,
     resource_sound text DEFAULT ''::text NOT NULL,
     category_id integer DEFAULT 0 NOT NULL,
-    question_id integer DEFAULT 0 NOT NULL,
+    question_id integer DEFAULT nextval('public.t_question_question_id_seq'::regclass) NOT NULL,
     previous_question integer DEFAULT 0 NOT NULL,
     next_question integer DEFAULT 0 NOT NULL,
     seq integer DEFAULT 0 NOT NULL,
     category_list_id integer DEFAULT 0 NOT NULL,
-    in_list smallint DEFAULT '0'::smallint NOT NULL
+    in_list smallint DEFAULT '0'::smallint NOT NULL,
+    choice_0 text DEFAULT ''::text NOT NULL,
+    choice_1 text DEFAULT ''::text NOT NULL,
+    choice_2 text DEFAULT ''::text NOT NULL,
+    choice_3 text DEFAULT ''::text NOT NULL,
+    explanation text DEFAULT ''::text NOT NULL
 );
 
 
@@ -276,70 +345,6 @@ ALTER SEQUENCE public.t_message_message_id_seq OWNED BY public.t_message.message
 
 
 --
--- Name: t_question; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.t_question (
-    question_id integer NOT NULL,
-    question_txt text DEFAULT ''::text NOT NULL,
-    usr_id integer DEFAULT 0 NOT NULL,
-    usr_img text DEFAULT ''::text NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    choice_0 text DEFAULT ''::text NOT NULL,
-    choice_1 text DEFAULT ''::text NOT NULL,
-    choice_2 text DEFAULT ''::text NOT NULL,
-    choice_3 text DEFAULT ''::text NOT NULL,
-    reference text DEFAULT ''::text NOT NULL,
-    question_type smallint DEFAULT '0'::smallint NOT NULL,
-    category_id integer DEFAULT 0 NOT NULL,
-    question_img text DEFAULT ''::text NOT NULL,
-    previous_question integer DEFAULT 0 NOT NULL,
-    next_question integer DEFAULT 0 NOT NULL,
-    sequence integer DEFAULT 0 NOT NULL,
-    sound text DEFAULT ''::text NOT NULL,
-    explanation text DEFAULT ''::text NOT NULL
-);
-
-
-ALTER TABLE public.t_question OWNER TO postgres;
-
---
--- Name: COLUMN t_question.question_type; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public.t_question.question_type IS '0=choice, 1=text, 2=picture';
-
-
---
--- Name: COLUMN t_question.sequence; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN public.t_question.sequence IS 'within leaf category';
-
-
---
--- Name: t_question_question_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.t_question_question_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.t_question_question_id_seq OWNER TO postgres;
-
---
--- Name: t_question_question_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.t_question_question_id_seq OWNED BY public.t_question.question_id;
-
-
---
 -- Name: usr_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -527,10 +532,17 @@ GRANT USAGE ON SCHEMA public TO exam_8099;
 
 
 --
--- Name: TABLE c_resource; Type: ACL; Schema: public; Owner: postgres
+-- Name: TABLE t_question; Type: ACL; Schema: public; Owner: postgres
 --
 
-GRANT ALL ON TABLE public.c_resource TO exam_8099;
+GRANT ALL ON TABLE public.t_question TO exam_8099;
+
+
+--
+-- Name: SEQUENCE t_question_question_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE public.t_question_question_id_seq TO exam_8099;
 
 
 --
@@ -615,20 +627,6 @@ GRANT ALL ON TABLE public.t_message TO exam_8099;
 --
 
 GRANT SELECT,USAGE ON SEQUENCE public.t_message_message_id_seq TO exam_8099;
-
-
---
--- Name: TABLE t_question; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.t_question TO exam_8099;
-
-
---
--- Name: SEQUENCE t_question_question_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT SELECT,USAGE ON SEQUENCE public.t_question_question_id_seq TO exam_8099;
 
 
 --

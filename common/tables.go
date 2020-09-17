@@ -80,14 +80,14 @@ type TQuestion struct {
 	Choice2          string    // choice_2
 	Choice3          string    // choice_3
 	Reference        string    // reference
-	QuestionType     int16     // question_type
 	CategoryID       int       // category_id
 	QuestionImg      string    // question_img
 	PreviousQuestion int       // previous_question
 	NextQuestion     int       // next_question
-	Sequence         int       // sequence
+	Sequence         int       // sequence within leaf category
 	Sound            string    // sound
 	Explanation      string    // explanation
+	ChoiceType       int16     // choice_type 0=text, 1=image, 2=html
 }
 
 type TUsr struct {

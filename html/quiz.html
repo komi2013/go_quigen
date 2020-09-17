@@ -93,19 +93,21 @@
   <img src="{{.Q.QuestionImg}}" id="photo">
 </div>
 {{ end }}
+
 <div style="padding: 5px 5px 20px 5px;"> 
 No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span> 
 {{ if eq .Available 0 }}
 <div style="width:100%;text-align:center;" onclick="playingAudio();"><img src="/img/icon/speaker.png"></div> 
 {{end}}
 </div>
+
 <div id="app" line="182">
 <div style="position: relative;">
   <div style="position: absolute; width:100%; text-align: center;">
   <img src="/img/icon/circle_big.png" class="big_icon" v-if="circle">
   <img src="/img/icon/cross_big.png" class="big_icon" v-if="cross">
   </div>
-  {{if eq .Q.QuestionType 2}}
+  {{if eq .Q.ChoiceType 1 }}
   <table class="choicePicture"><tr>
       <td @click="choose(0)" :style="choices[0][2]" ><img :src="choices[0][1]"></td>
       <td @click="choose(1)" :style="choices[1][2]" ><img :src="choices[1][1]"></td>
@@ -113,7 +115,6 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
       <td @click="choose(2)" :style="choices[2][2]" ><img :src="choices[2][1]"></td>
       <td @click="choose(3)" :style="choices[3][2]" ><img :src="choices[3][1]"></td>
   </tr></table>
-
   {{else}}
   <div v-if="localStorage.qType == 1">
     <input type="text" style="width:92%;height:50px;" v-model="choiceTxt" >
@@ -122,15 +123,15 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
     </div>
   </div>
   <table v-if="!localStorage.qType">
-    <tr></tr><td class="choice" @click="choose(0)" :style="choices[0][2]" >[[ choices[0][1] ]]</td></tr>
-    <tr></tr><td class="choice" @click="choose(1)" :style="choices[1][2]" >[[ choices[1][1] ]]</td></tr>
-    <tr></tr><td class="choice" @click="choose(2)" :style="choices[2][2]" >[[ choices[2][1] ]]</td></tr>
-    <tr></tr><td class="choice" @click="choose(3)" :style="choices[3][2]" >[[ choices[3][1] ]]</td></tr>
+    <tr></tr><td class="choice" @click="choose(0)" :style="choices[0][2]" v-html="choices[0][1]" ></td></tr>
+    <tr></tr><td class="choice" @click="choose(1)" :style="choices[1][2]" v-html="choices[1][1]" ></td></tr>
+    <tr></tr><td class="choice" @click="choose(2)" :style="choices[2][2]" v-html="choices[2][1]" ></td></tr>
+    <tr></tr><td class="choice" @click="choose(3)" :style="choices[3][2]" v-html="choices[3][1]" ></td></tr>
   </table>
   {{end}}
 
 </div>
-{{ if eq .Q.QuestionType 0 }}
+{{ if eq .Q.ChoiceType 0 }}
 <table>
   <tr>
   <td :class="{ silver: !localStorage.qType }" onclick="chgQtype(1)"> <img src="/img/icon/textbox.png" class="icon"></td>
@@ -162,7 +163,7 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
     <img class="ans_icon" v-if="d[0]" :src="d[0]" :style="d[1]">
   </td></tr>
 </table>
-<div style="padding: 5px 5px 20px 5px;" id="explanation">{{.Q.Explanation}}</div>
+<div style="padding: 5px 5px 20px 5px;" id="explanation">{{.Qexplanation}}</div>
 <textarea placeholder="comment" style="width:92%;margin: 2px;" v-model="commentTxt"></textarea>
 <div style="width:100%;text-align:right;">
   <img src="/img/icon/upload_0.png" alt="comment" class="icon" v-if="!commented && commentTxt" @click="commenting">
@@ -414,7 +415,7 @@ function saveLocal(correct){
     ,$('#question_txt').html().replace(/<br>/g,"\n")
     ,app.preChoices
     ,$('#reference').html() ? $('#reference').html() : ''
-    ,'{{.Q.QuestionType}}'
+    ,0
     ,'{{.Q.QuestionImg}}'
     ,correct
     ,$('#explanation').html().replace(/<br>/g,"\n")

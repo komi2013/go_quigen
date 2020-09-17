@@ -40,6 +40,11 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         Description string
         OgImage string
         Qtxt template.HTML
+        Choice0 template.HTML
+        Choice1 template.HTML
+        Choice2 template.HTML
+        Choice3 template.HTML
+        Qexplanation template.HTML
         // PleaseClick string
     }
     var view View
@@ -55,7 +60,10 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
         return
     }
     var query string
-    query = "SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,choice_1,choice_2,choice_3,reference,question_type,category_id,question_img,previous_question,next_question,sequence,sound,explanation from t_question WHERE question_id = $1"
+    query = `SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,
+        choice_1,choice_2,choice_3,reference,category_id,question_img,
+        previous_question,next_question,sequence,sound,explanation,choice_type
+        from t_question WHERE question_id = $1`
     rows, err := db.Query(query, r.FormValue("q"))
     if err != nil {
         fmt.Println(query)
@@ -66,7 +74,9 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     nothing := true
     for rows.Next() {
         r := common.TQuestion{}
-        if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, &r.Choice2, &r.Choice3, &r.Reference, &r.QuestionType, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation); err != nil {
+        if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, 
+            &r.Choice2, &r.Choice3, &r.Reference, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, 
+            &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation, &r.ChoiceType); err != nil {
             log.Print(err)
         }
         view.UpdatedAt = r.UpdatedAt.Format("2006-01-02 15:04:05")
@@ -94,7 +104,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     if txtLen < descLen {
         descLen  = txtLen
     }
-    // fmt.Printf("question %#v\n", question)
+    
     // fmt.Printf("descLen %#v\n", descLen)
     // r.QuestionTxt = string(txt[0:titleLen])
     view.Title = string(txt[0:titleLen])
@@ -107,7 +117,13 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     // s := strings.Replace(question.QuestionTxt, "\n", "<br>", -1)
     // escape := template.HTML(strings.Replace(question.QuestionTxt, "\n", "<br>", -1))
     view.Qtxt = template.HTML(strings.Replace(question.QuestionTxt, "\n", "<br>", -1))
+    view.Choice0 = template.HTML(strings.Replace(question.Choice0, "\n", "<br>", -1))
+    view.Choice1 = template.HTML(strings.Replace(question.Choice1, "\n", "<br>", -1))
+    view.Choice2 = template.HTML(strings.Replace(question.Choice2, "\n", "<br>", -1))
+    view.Choice3 = template.HTML(strings.Replace(question.Choice3, "\n", "<br>", -1))
+    view.Qexplanation = template.HTML(strings.Replace(question.Explanation, "\n", "<br>", -1))
     view.Q = question
+    // fmt.Printf("question %#v\n", view.Q)
     convert := make(map[int]string)
     var tree [][2]int
     var x [2]int
