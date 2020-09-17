@@ -15,9 +15,12 @@ INSERT INTO m_category_question
 (
   question_id, category_id, question_title, in_list
 )
-select question_id, category_list_id, resource_txt, in_list
-from c_resource where question_id > 561
+select question_id, 1, substr(question_txt, 0, 30), 1
+from t_question 
+where sequence = 1
+AND category_id in (2,3,4,5,15,18,19) 
 order by question_id ASC
+
 
 update t_question set choice_1 = c_resource.resource_img
 from c_resource
