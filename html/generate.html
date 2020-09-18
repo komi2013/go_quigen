@@ -96,13 +96,21 @@
   </tr>
 </table>
 
-<table style="width:100%;text-align:center;">
-  <tr><td>{{.CategoryName}}</td></tr>
+<table style="width:100%;">
+  <tr><td><select style="height:50px;" v-model="category_id">
+    <option v-for="(d,k) in category" :value="k" >[[ d ]]</option>
+  </select></td></tr>
 </table>
 
 <table style="width:100%;text-align:center;">
   <tr><td class="td_99"><input type="text" placeholder="reference:" maxlength="1000" class="txt_99" id="reference"></td></tr>
+  <tr><td class="td_99"><input type="text" placeholder="reference2:" maxlength="1000" class="txt_99" id="reference2"></td></tr>
 </table>
+
+<table>
+<tr><td><textarea placeholder="explanation" maxlength="2000" class="txt_long" id="explanation"></textarea></td></tr>
+</table>
+
 
 <table cellspacing="0">
   <tr>
@@ -135,9 +143,15 @@
 <script>
 var u_id = '';
 var csrf = '{{.CSRF}}';
-</script>
 
-<script>
+var app = new Vue({
+  el: '#content',
+  delimiters: ['[[', ']]'],
+  data: {
+    category: JSON.parse({{.Category}}),
+    category_id: $.cookie('cat'),
+  },
+});
 
 $('#generate').click(function(){
   var validate = 1;
@@ -163,6 +177,7 @@ $('#generate').click(function(){
     var imgdata = 'no';
   }
   var myphoto = localStorage.myphoto ? localStorage.myphoto : '';
+  $.cookie('cat',app.category_id,{expires:7, path:'/'});
   var param = {
     csrf : csrf
     ,q_txt : $('#q_txt').val()
@@ -175,7 +190,10 @@ $('#generate').click(function(){
     ,tag_1 : $('#tag_1').val()
     ,tag_2 : $('#tag_2').val()
     ,myphoto : myphoto
+    ,category : app.category_id
     ,reference : $('#reference').val()
+    ,reference2 : $('#reference2').val()
+    ,explanation : $('#explanation').val()
   };
   $.post('/GenerateQuiz/',param,function(){},"json")
   .always(function(res){

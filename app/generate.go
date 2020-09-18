@@ -7,7 +7,7 @@ import (
     _ "github.com/lib/pq"
     "log"
     "net/http"
-    // "time"
+    "encoding/json"
     "../common"
     // "./app"
     // "crypto/aes"
@@ -21,31 +21,27 @@ func Generate(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
     }
     defer db.Close()
-    var cat string
-    cookie, err := r.Cookie("cat")
+    rows, err := db.Query("SELECT category_id, category_name FROM m_category_name")
     if err != nil {
-		cat = "0"
-    } else {
-        cat = cookie.Value
-    }
-    
-    query := "SELECT category_name FROM m_category_name WHERE category_id = $1"
-    rows, err := db.Query(query, cat)
-    if err != nil {
-        log.Print(query)
+        // log.Print(query)
         log.Print(r.FormValue("q"))
         log.Print(err)
     }
-    category_name := ""
+    category := map[int]string{}
     for rows.Next() {
-        if err := rows.Scan(&category_name); err != nil {
+        category_id := 0
+        category_name := ""
+        if err := rows.Scan(&category_id,&category_name); err != nil {
             log.Print(err)
         }
+        category[category_id] = category_name
     }
+    res, _ := json.Marshal(category)
+    // fmt.Printf("%#v\n", string(res))
     m := map[string]string{
         "CacheV": common.CACHE_V,
         "CSRF": common.MakeCSRF(w,r),
-        "CategoryName": category_name,
+        "Category": string(res),
     }
     tpl := template.Must(template.ParseFiles("html/generate.html"))
     tpl.Execute(w, m)

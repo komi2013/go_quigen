@@ -61,7 +61,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     }
     var query string
     query = `SELECT question_id,question_txt,usr_id,usr_img,updated_at,choice_0,
-        choice_1,choice_2,choice_3,reference,category_id,question_img,
+        choice_1,choice_2,choice_3,reference,reference2,category_id,question_img,
         previous_question,next_question,sequence,sound,explanation,choice_type
         from t_question WHERE question_id = $1`
     rows, err := db.Query(query, r.FormValue("q"))
@@ -75,7 +75,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
     for rows.Next() {
         r := common.TQuestion{}
         if err := rows.Scan(&r.QuestionID, &r.QuestionTxt, &r.UsrID, &r.UsrImg, &r.UpdatedAt, &r.Choice0, &r.Choice1, 
-            &r.Choice2, &r.Choice3, &r.Reference, &r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, 
+            &r.Choice2, &r.Choice3, &r.Reference,&r.Reference2,&r.CategoryID, &r.QuestionImg, &r.PreviousQuestion, 
             &r.NextQuestion, &r.Sequence, &r.Sound, &r.Explanation, &r.ChoiceType); err != nil {
             log.Print(err)
         }

@@ -88,6 +88,7 @@ type TQuestion struct {
 	Sound            string    // sound
 	Explanation      string    // explanation
 	ChoiceType       int16     // choice_type 0=text, 1=image, 2=html
+	Reference2       string    // reference2
 }
 
 type TUsr struct {
