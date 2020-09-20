@@ -22,12 +22,12 @@ db = postgresql.open('pq://exam_8099:Zk1CGsBK@localhost:5432/programming')
 
 
 # JSONファイルのロード
-# arr = json.load(open('/Project/go_quigen/log/basicInfo.json', 'r'))
+arr = json.load(open('/Project/go_quigen/log/e-words.json', 'r'))
 # list of dictの抽出
 
-# for d in arr:
-#     print(d[1])
-#     ps = db.prepare("INSERT INTO c_resource (resource_txt, choice_0, choice_1, choice_2, choice_3, explanation)"+
-#                "VALUES($1,$2,$3,$4,$5,$6)")
-#     ps(d[0],d[4],d[1],d[2],d[3],d[5])
+for d in arr:
+    print(d[1])
+    ps = db.prepare("INSERT INTO c_word (question, choice_0)"+
+               "VALUES($1,$2)")
+    ps(d[1],d[0])
 

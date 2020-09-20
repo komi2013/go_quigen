@@ -1,95 +1,47 @@
-document.getElementsByXPath = function(expression, parentElement) {
-  var r = []
-  var x = document.evaluate(expression, parentElement || document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
-  for (var i = 0, l = x.snapshotLength; i < l; i++) {
-      r.push(x.snapshotItem(i))
+// $(function(){
+  for (i = 0; i < 500; i++) {
+    // console.log($('#ranking > table > tbody > tr:nth-child('+i+') > td:nth-child(2) > div > a').attr('href'));
+    // console.log($('#ranking > table > tbody > tr:nth-child('+i+') > td:nth-child(2) > div > a').attr('href'));
+    // setInterval(countup, 1000);
+    var a = 1;
+    setTimeout(function(){
+      console.log($('#ranking > table > tbody > tr:nth-child('+a+') > td:nth-child(2) > div > a').attr('href'));
+      a++;
+    },i * 500);
   }
-  return r
-}
-// console.log(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[1]')[0].firstChild.nodeValue);
-
-var arr = [];
-
-// #mainCol > div.main.kako.doujou > div:nth-child(4)
-arr.push($('#mainCol > div.main.kako.doujou > div:nth-child(4)').html());
-
-// console.log($('#select_a').html());
-var choice_0 = '';
-if ( $('#select_a').html() ) {
-  if ( $('#answerChar').html() == 'ア' ) {
-    choice_0 = $('#select_a').html()
-    $('.selectBtn')[0].click();
-  }else{
-    arr.push($('#select_a').html());
+    // $("#ranking > table > tbody > tr").each(function( index ) {
+    //   console.log( $( this ).children( "td:nth-child(2) > div > a") );
+    // });  
+  // });
+  var urls = ["http://e-words.jp/w/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88.html"
+  ,"http://e-words.jp/w/%E3%82%B3%E3%83%A1%E3%83%B3%E3%83%88.html"];
+  for (i = 0; i < 1; i++) {
+    console.log(urls[i]);
   }
-  if ( $('#answerChar').html() == 'イ' ) {
-    choice_0 = $('#select_i').html()
-    $('.selectBtn')[1].click();
-  }else{
-    arr.push($('#select_i').html());
-  }
-  if ( $('#answerChar').html() == 'ウ' ) {
-    choice_0 = $('#select_u').html()
-    $('.selectBtn')[2].click();
-  }else{
-    arr.push($('#select_u').html());
-  }
-  if ( $('#answerChar').html() == 'エ' ) {
-    choice_0 = $('#select_e').html()
-    $('.selectBtn')[3].click();
-  }else{
-    arr.push($('#select_e').html());
-  }
-} else {
-  if ( $('#answerChar').html() == 'ア' ) {
-    choice_0 = 'ア'
-  }else{
-    arr.push('ア');
-  }
-  if ( $('#answerChar').html() == 'イ' ) {
-    choice_0 = 'イ'
-  }else{
-    arr.push('イ');
-  }
-  if ( $('#answerChar').html() == 'ウ' ) {
-    choice_0 = 'ウ'
-  }else{
-    arr.push('ウ');
-  }
-  if ( $('#answerChar').html() == 'エ' ) {
-    choice_0 = 'エ'
-  }else{
-    arr.push('エ');
-  }
-}
-arr.push(choice_0);
-// arr.push($('#answerChar').html());
-// console.log($('#kaisetsu div').eq(-0).html());
-if ($('#kaisetsu div') && $('#kaisetsu div').eq(-0)) {
-  // console.log(document.getElementsByXPath('//*[@id="kaisetsu"]/div[1]')[0].firstChild.nodeValue);
-  arr.push($('#kaisetsu div').eq(-0).html());
-
-}
-
-if( $('#answerChar').html() ){
-  var localQ = localStorage.q ? JSON.parse(localStorage.q) : [];
-  localQ.unshift(arr);
-  localStorage.q = JSON.stringify(localQ);
-  $('.submit').click();
-}
-
-
-// let csvContent = "data:text/csv;charset=utf-8,";
-// localQ.forEach(function(rowArray) {
-//   let row = rowArray.join(",");
-//   csvContent += row + "\r\n";
-// });
-
-// console.log(arr);
-// console.log(csvContent);
-// var encodedUri = encodeURI(csvContent);
-// window.open(encodedUri);
-// console.log(document.getElementsByXPath('//*[@id="mainCol"]/div[2]/div[1]/div/img')[0].src);
-
-// 平成25年春期　問1
-// 平成31年春期　問3
+  // function scraping() {
+    var q = localStorage.q ? JSON.parse(localStorage.q) : [];
+    // var numberI = localStorage.numberI ? localStorage.numberI : 0;
+    var quiz = [];
+    // console.log($('#word').text());
+    // console.log($('#Summary').text());
+    // #content > article > p:nth-child(6)
+    quiz[0] = $('#word').text();
+    quiz[1] = $('#Summary').text();
+    // console.log(document.getElementsByXPath('//*[@id="content"]/article/p[3]')[0].firstChild.nodeValue);
+    
+    for (i = 1; i < $('#content > article > p').length+1; i++) {
+      // console.log($('#content > article > p:nth-child('+i+')').firstChild.nodeValue);
+      quiz[1] = quiz[1] + document.getElementsByXPath('//*[@id="content"]/article/p['+i+']')[0].innerHTML;
+      // console.log(document.getElementsByXPath('//*[@id="content"]/article/p['+i+']')[0].innerHTML);
+    }
+    q[q.length] = quiz;
+    // console.log(quiz);
+    // JSON.parse(localStorage.quiz);
+    localStorage.q = JSON.stringify(q);
+    localStorage.numberI++;
+    if(localStorage.numberI < urls.length){
+      location.href = urls[localStorage.numberI];
+    }
+    
+  // }
+  
