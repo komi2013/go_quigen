@@ -16,4 +16,6 @@ setTimeout(function(){
   location.href = urls[0];
 },1000);
 
-  
+// 1 ~500 e-words
+// 500 ~ 1250 otsuka
+// 
