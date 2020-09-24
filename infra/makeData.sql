@@ -40,10 +40,10 @@ WHERE t1.question_id = t2.question_id
 INSERT INTO t_question
 (
 question_id, category_id, question_txt, choice_0, choice_1, choice_2, choice_3, 
-usr_id, usr_img, question_type, choice_type, explanation
+usr_id, usr_img, choice_type, explanation, sequence, previous_question, next_question
 )
 SELECT question_id, category_id, resource_txt, choice_0, choice_1, choice_2, choice_3,
-3, '/data/usr/20200715/3.png', 3, 0, explanation
+3, '/data/usr/20200715/3.png', 0, explanation, seq, previous_question, next_question
 FROM c_resource
 ORDER BY question_id ASC
 

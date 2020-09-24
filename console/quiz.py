@@ -31,14 +31,21 @@ db = postgresql.open('pq://exam_8099:Zk1CGsBK@localhost:5432/programming')
 #         with open(x[6], 'bw') as o:
 #             o.write(u.read())
 
+# word_id
+# 1 ~500 e-words
+# 500 ~ 1250 otsuka
+# 1250 ~ 1345
+# question_id 
+# 2001 ~ from word
 
 # JSONファイルのロード
-arr = json.load(open('/Project/go_quigen/log/php_function.json', 'r'))
+arr = json.load(open('/Project/go_quigen/log/lpic-study.json', 'r'))
 # list of dictの抽出
 
 for d in arr:
     print(d[0])
-    ps = db.prepare("INSERT INTO c_word (question, choice_0)"+
-               "VALUES($1,$2)")
-    ps(d[1],d[0])
+    ps = db.prepare("""INSERT INTO c_resource 
+        (choice_0,choice_1,choice_2,choice_3,resource_txt,explanation,category_id)
+        VALUES($1,$2,$3,$4,$5,$6,$7)""")
+    ps(d[0],d[1],d[2],d[3],d[4],d[5],75)
 
