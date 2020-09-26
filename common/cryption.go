@@ -4,12 +4,13 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"log"
-    "io"
-	"encoding/hex"
 	"encoding/base64"
+	"encoding/hex"
+	"io"
+	"log"
 )
 
+// Encrypt use NewCFBEncrypter library"
 func Encrypt(keyStr string, text string) string {
 	key, _ := hex.DecodeString(keyStr)
 	plaintext := []byte(text)
@@ -25,11 +26,12 @@ func Encrypt(keyStr string, text string) string {
 	}
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
-	enctxt := base64.StdEncoding.EncodeToString(ciphertext) 
+	enctxt := base64.StdEncoding.EncodeToString(ciphertext)
 	return enctxt
 }
 
-func Decrypt(keyStr string, text string) string{
+// Decrypt use NewCFBDecrypter if something wrong, return value would be empty
+func Decrypt(keyStr string, text string) string {
 	key, _ := hex.DecodeString(keyStr)
 	ciphertext, _ := base64.StdEncoding.DecodeString(text)
 	block, err := aes.NewCipher(key)
