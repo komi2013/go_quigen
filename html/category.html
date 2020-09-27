@@ -94,33 +94,6 @@
 <br>
 <div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
 
-<script>
-var csrf = '{{.CSRF}}';
-var app = new Vue({
-  el: '#app',
-  delimiters: ['[[', ']]'],
-  data: {
-    Question:[],
-  },
-});
-
-function questionShow(){
-  $.get('/NewQuestionShow/',{csrf:csrf},function(){},"json")
-  .always(function(res){
-    if(res['Status']==1){
-      app.Question = res['Question'];
-      console.log(app.Question);
-    }else{
-      console.log(res);
-    }
-  });
-}
-
-if(csrf){
-//  questionShow();
-}
-</script>
-
 <script src="/js/common.js{{.CacheV}}"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
 <script>
