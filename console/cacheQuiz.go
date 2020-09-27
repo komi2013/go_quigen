@@ -9,7 +9,7 @@ import (
 	"database/sql"
 
 	"../common"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // this driver for postgres
 
 	// "io/ioutil"
 	// "os/exec"
@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	connStr := common.DB_CONNECT
+	connStr := common.DbConnect
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		fmt.Println(err)

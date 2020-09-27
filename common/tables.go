@@ -1,20 +1,22 @@
 package common
 
 import (
-    "time"
+	"time"
 )
 
+// HAnswer is table
 type HAnswer struct {
 	QuestionID    int       // question_id
 	QuestionTxt   string    // question_txt
 	CategoryID    int       // category_id
 	RespondentID  int       // respondent_id
 	RespondentImg string    // respondent_img
-	Correct       float64       // correct
+	Correct       float64   // correct
 	CreatedAt     time.Time // created_at
 	EtoColor      string    // not in table
 }
 
+// MCategoryName is table
 type MCategoryName struct {
 	CategoryID          int       // category_id
 	CategoryName        string    // category_name
@@ -22,14 +24,16 @@ type MCategoryName struct {
 	CategoryDescription string    // category_description
 }
 
+// MCategoryQuestion is table
 type MCategoryQuestion struct {
-	QuestionID        int       // question_id
-	CategoryID        int       // category_id
-	UpdatedAt         time.Time // updated_at
-	QuestionTitle     string    // question_txt
-	InList            int       // in_list
+	QuestionID    int       // question_id
+	CategoryID    int       // category_id
+	UpdatedAt     time.Time // updated_at
+	QuestionTitle string    // question_txt
+	InList        int       // in_list
 }
 
+// MCategoryTree is table
 type MCategoryTree struct {
 	LeafID    int       // leaf_id
 	Level1    int       // level_1
@@ -43,12 +47,14 @@ type MCategoryTree struct {
 	UpdatedAt time.Time // updated_at
 }
 
+// MPublicMessage is table
 type MPublicMessage struct {
 	PublicMessageID  int       // public_message_id
 	PublicMessageTxt string    // public_message_txt
 	UpdatedAt        time.Time // updated_at
 }
 
+// TComment is table
 type TComment struct {
 	CommentID  int       // comment_id
 	CommentTxt string    // comment_txt
@@ -56,9 +62,10 @@ type TComment struct {
 	QuestionID int       // question_id
 	CreatedAt  time.Time // created_at
 	UsrImg     string    // usr_img
-	EtoColor   string     // not in table
+	EtoColor   string    // not in table
 }
 
+// TMessage is table
 type TMessage struct {
 	MessageID  int       // message_id
 	Sender     int       // sender
@@ -68,6 +75,7 @@ type TMessage struct {
 	MessageImg string    // message_img
 }
 
+// TQuestion is table
 type TQuestion struct {
 	QuestionID       int       // question_id
 	QuestionTxt      string    // question_txt
@@ -91,13 +99,13 @@ type TQuestion struct {
 	Reference2       string    // reference2
 }
 
+// TUsr is table
 type TUsr struct {
-	UsrID        int       // usr_id
-	PvUID        string    // pv_u_id
-	Provider     int       // provider
-	UsrImg       string    // usr_img
-	UpdatedAt    time.Time // updated_at
-	Introduce    string    // introduce
-	PushTokens   []byte    // push_tokens
+	UsrID      int       // usr_id
+	PvUID      string    // pv_u_id
+	Provider   int       // provider
+	UsrImg     string    // usr_img
+	UpdatedAt  time.Time // updated_at
+	Introduce  string    // introduce
+	PushTokens []byte    // push_tokens
 }
-

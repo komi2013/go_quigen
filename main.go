@@ -31,8 +31,8 @@ func main() {
     http.HandleFunc("/search/", app.Search)
 
     http.HandleFunc("/", app.Top)
-    fmt.Println("starting.." + common.CACHE_V)
-    fmt.Println(common.DB_CONNECT)
+    fmt.Println("starting.." + common.CacheV)
+    fmt.Println(common.DbConnect)
 
-    log.Fatal(http.ListenAndServe(common.GO_PORT, nil))
+    log.Fatal(http.ListenAndServe(common.GoPort, nil))
 }
