@@ -78,13 +78,14 @@ SET
   explanation = t2.txt
 FROM comment AS t2
 WHERE t1.question_id = t2.question_id
+AND t2.txt <> ''
 
 
 INSERT INTO m_category_name 
 (
   category_name, updated_at
 )
-SELECT txt, '2020-09-05 08:08:00' FROM tag 
+SELECT txt, '2020-10-05 08:08:00' FROM tag 
 GROUP BY txt
 ORDER BY txt
 
@@ -122,7 +123,7 @@ WHERE t1.question_id = t2.question_id
 AND category_id = 50
 
 INSERT INTO m_category_tree (leaf_id, level_1, updated_at)
-SELECT category_id, category_id, '2020-09-05 09:30:00'
+SELECT category_id, category_id, '2020-10-10 09:30:00'
 FROM m_category_name
 
 UPDATE
@@ -134,8 +135,8 @@ WHERE
   t1.category_name = t2.tag
 
 INSERT INTO m_category_question (
-  question_id, category_id, updated_at, SUBSTR(question_title, 0 , 60), in_list)
-SELECT question_id, category_id, '2020-09-05 09:14:00', question_txt, 1
+  question_id, category_id, updated_at, question_title, in_list)
+SELECT question_id, category_id, '2020-10-10 09:14:00', SUBSTR(question_txt, 0 , 60), 1
 FROM t_question
 WHERE sequence = 1
 order by category_id , sequence

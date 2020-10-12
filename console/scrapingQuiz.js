@@ -47,3 +47,13 @@ if(!$("#table-01 > tbody > tr:nth-child(4) > td > p:nth-child(2) > b").text()){
     },200);
   }
 }
+
+if( $( "#mainCol > div.main.kako.doujou > div.ansbg > ul > li > img" ).length > 0 ){
+  console.log( $("#mainCol > div.main.kako.doujou > div:nth-child(4)").html() );
+  var q = localStorage.q ? JSON.parse(localStorage.q) : [];
+  q[q.length] = [$("#mainCol > div.main.kako.doujou > div:nth-child(4)").html(),
+    $( "#mainCol > div.main.kako.doujou > div.ansbg > ul > li > img" ).attr('src')];
+  localStorage.q = JSON.stringify(q);
+}
+$("#mainCol > div.main.kako.doujou > div.ansbg > ul > li > ul > li:nth-child(1) > a > button").click();
+$("#configform > div.bottomBtns > button.submit").click();

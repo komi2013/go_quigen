@@ -70,14 +70,14 @@
 <div id="content">
 
 <table>
-<tr><td><textarea placeholder="Q." maxlength="2000" class="txt_long" id="q_txt"></textarea></td></tr>
+<tr><td><textarea placeholder="Q." maxlength="2000" class="txt_long" id="q_txt">{{.question_txt}}</textarea></td></tr>
 </table>
 
 <table id="from_text">
-<tr><td><input type="text" placeholder="O" maxlength="1000" id="choice_0"></td></tr>
-<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_1"></td></tr>
-<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_2"></td></tr>
-<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_3"></td></tr>
+<tr><td><input type="text" placeholder="O" maxlength="1000" id="choice_0" value="{{.choice_0}}"></td></tr>
+<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_1" value="{{.choice_1}}"></td></tr>
+<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_2" value="{{.choice_2}}"></td></tr>
+<tr><td><input type="text" placeholder="X" maxlength="1000" id="choice_3" value="{{.choice_3}}"></td></tr>
 </table>
 
 <div style="width:98%;text-align:right;">
@@ -103,12 +103,12 @@
 </table>
 
 <table style="width:100%;text-align:center;">
-  <tr><td class="td_99"><input type="text" placeholder="reference:" maxlength="1000" class="txt_99" id="reference"></td></tr>
-  <tr><td class="td_99"><input type="text" placeholder="reference2:" maxlength="1000" class="txt_99" id="reference2"></td></tr>
+  <tr><td class="td_99"><input type="text" placeholder="reference:" maxlength="1000" class="txt_99" id="reference" value="{{.reference}}"></td></tr>
+  <tr><td class="td_99"><input type="text" placeholder="reference2:" maxlength="1000" class="txt_99" id="reference2" value="{{.reference2}}"></td></tr>
 </table>
 
 <table>
-<tr><td><textarea placeholder="explanation" maxlength="2000" class="txt_long" id="explanation"></textarea></td></tr>
+<tr><td><textarea placeholder="explanation" maxlength="2000" class="txt_long" id="explanation">{{.explanation}}</textarea></td></tr>
 </table>
 
 
@@ -143,6 +143,7 @@
 <script>
 var u_id = '';
 var csrf = '{{.CSRF}}';
+var question_id = '{{.question_id}}';
 
 var app = new Vue({
   el: '#content',
@@ -168,6 +169,7 @@ $('#generate').click(function(){
   if(validate==2){
     return;
   }
+  
   $('#generate').css({'display': 'none'});  
   $('#success').css({'display': ''});
   var mycanvas = document.getElementById('mycanvas');
@@ -194,11 +196,12 @@ $('#generate').click(function(){
     ,reference : $('#reference').val()
     ,reference2 : $('#reference2').val()
     ,explanation : $('#explanation').val()
+    ,question_id : question_id
   };
   $.post('/GenerateQuiz/',param,function(){},"json")
   .always(function(res){
     if(res[0]==1){
-      location.href = '/quiz/?q='+res[1];
+      location.href = '/generate/?q='+res[1];
     }else{
       $('#success').css({'display': 'none'});
       $('#generate').css({'display': ''});
