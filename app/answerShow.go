@@ -15,11 +15,11 @@ import (
 
 // AnswerShow to quiz page with AJAX
 func AnswerShow(w http.ResponseWriter, r *http.Request) {
-	ok := common.CheckCSRF(r, r.FormValue("csrf"))
-	if !ok {
-		fmt.Fprint(w, `["2","CSRF Error"]`)
-		return
-	}
+	// ok := common.CheckCSRF(r, r.FormValue("csrf"))
+	// if !ok {
+	// 	fmt.Fprint(w, `["2","CSRF Error"]`)
+	// 	return
+	// }
 	db, err := sql.Open("postgres", common.DbConnect)
 	if err != nil {
 		log.Print(err)
