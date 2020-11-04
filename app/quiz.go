@@ -30,7 +30,6 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	}
 	type View struct {
 		CacheV       string
-		UID          int
 		Q            common.TQuestion
 		UpdatedAt    string
 		Myphoto      string
@@ -52,7 +51,6 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	view.CacheV = common.CacheV
 	uID := common.GetUser(w, r)
 	eto := common.Eto(uID)
-	view.UID = uID
 	view.Myphoto = eto[0]
 	view.EtoColor = eto[1]
 	if r.FormValue("q") == "" {
