@@ -30,7 +30,7 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	}
 	type View struct {
 		CacheV       string
-		CSRF         string
+		UID          int
 		Q            common.TQuestion
 		UpdatedAt    string
 		Myphoto      string
@@ -50,9 +50,9 @@ func Quiz(w http.ResponseWriter, r *http.Request) {
 	}
 	var view View
 	view.CacheV = common.CacheV
-	view.CSRF = common.MakeCSRF(w, r)
 	uID := common.GetUser(w, r)
 	eto := common.Eto(uID)
+	view.UID = uID
 	view.Myphoto = eto[0]
 	view.EtoColor = eto[1]
 	if r.FormValue("q") == "" {

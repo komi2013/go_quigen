@@ -69,8 +69,11 @@
   </td>
   </tr>
 </table>
+
 <table id="drawer">
-  <tr><td id="ad_menu" class="sp_disp_none"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
+  {{ if ne .UID 0 }}
+  <tr><td id="ad_menu"><iframe src="/advertisement/ad_300_250/" width="300" height="250" frameborder="0" scrolling="no"></iframe></td></tr>
+  {{ end }}
   <tr><td><a href="/"><img src="/img/icon/home.png" class="icon"></a></td></tr>
   <tr><td><a href="/htm/rule/"><img src="/img/icon/audit.png" class="icon"></a></td></tr>
 </table>
@@ -86,8 +89,9 @@
 </div>
   
 <div id="play" onclick="playing();">
-
+{{ if ne .UID 0 }}
 <div class="pc_disp_none"><iframe src="/advertisement/ad_320_50/" width="320" height="50" frameborder="0" scrolling="no"></iframe></div>
+{{ end }}
 {{ if .Q.QuestionImg}}
 <div id="div_photo">
   <img src="{{.Q.QuestionImg}}" id="photo">
@@ -212,16 +216,15 @@ No.{{.Q.Sequence}} <span id="question_txt">{{.Qtxt}}</span>
 </div>
 
 </div>
-<div id="ad_right" class="sp_disp_none">
-  <iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe>
-</div>
-
+{{ if ne .UID 0 }}
+<div id="ad_right"><iframe src="/advertisement/ad_160_600/" width="160" height="600" frameborder="0" scrolling="no"></iframe></div>
+{{ end }}
 <script>
 
 localStorage.myphoto  = '{{.Myphoto}}';
 localStorage.etoColor = '{{.EtoColor}}';
 
-var csrf = '{{.CSRF}}';
+var csrf = '';
 var q_id = '{{.Q.QuestionID}}';
 var myphoto = '{{.Myphoto}}';
 var etoColor = '{{.EtoColor}}';
@@ -472,7 +475,9 @@ function posting(correct,update){
 
 </script>
 
-<script src="/js/common.js{{.CacheV}}"></script>
+<script defer src="/js/common.js{{.CacheV}}"></script>
+
+{{ if ne .UID 0 }}
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-57298122-1"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -480,7 +485,7 @@ function posting(correct,update){
   gtag('js', new Date());
   gtag('config', 'UA-57298122-1');
 </script>
-
+{{ end }}
 </body>
 </html>
 
