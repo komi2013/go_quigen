@@ -14,7 +14,7 @@ import (
 // MessageAdd insert t_message
 func MessageAdd(w http.ResponseWriter, r *http.Request) {
 	uID := common.GetUser(w, r)
-	ok := common.CheckCSRF(r, r.FormValue("csrf"))
+	ok := common.CheckCSRF(r, r.FormValue("csrf"), w)
 	if !ok {
 		fmt.Fprint(w, `["2","CSRF Error"]`)
 		return

@@ -27,7 +27,7 @@ func MakeCSRF(w http.ResponseWriter, r *http.Request) string {
 }
 
 // CheckCSRF check value exists, can be decrypt, not expired
-func CheckCSRF(r *http.Request, page string) bool {
+func CheckCSRF(r *http.Request, page string, w http.ResponseWriter) bool {
 	cookie, err := r.Cookie("xr")
 	u62 := ""
 	if err == nil {
@@ -47,5 +47,15 @@ func CheckCSRF(r *http.Request, page string) bool {
 		log.Print("CSRF is expired")
 		return false
 	}
+	// var w http.ResponseWriter
+	cookie = &http.Cookie{
+		Name:     "xr",
+		Value:    "",
+		Path:     "/",
+		MaxAge:   0,
+		Secure:   true,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, cookie)
 	return true
 }

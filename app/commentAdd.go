@@ -15,7 +15,7 @@ import (
 // CommentAdd insert t_comment
 func CommentAdd(w http.ResponseWriter, r *http.Request) {
 
-	ok := common.CheckCSRF(r, r.FormValue("csrf"))
+	ok := common.CheckCSRF(r, r.FormValue("csrf"), w)
 	if !ok {
 		fmt.Fprint(w, `["2","CSRF Error"]`)
 		return

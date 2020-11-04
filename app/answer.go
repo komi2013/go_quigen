@@ -12,7 +12,7 @@ import (
 
 // Answer from quiz page
 func Answer(w http.ResponseWriter, r *http.Request) {
-	ok := common.CheckCSRF(r, r.FormValue("csrf"))
+	ok := common.CheckCSRF(r, r.FormValue("csrf"), w)
 	if !ok {
 		fmt.Fprint(w, `["2","CSRF Error"]`)
 		return
