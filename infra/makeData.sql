@@ -120,7 +120,7 @@ FROM (
     t_question
 ) AS t2
 WHERE t1.question_id = t2.question_id
-AND category_id = 50
+AND category_id in (95,96,97,98,99,100,101)
 
 INSERT INTO m_category_tree (leaf_id, level_1, updated_at)
 SELECT category_id, category_id, '2020-10-10 09:30:00'
@@ -136,7 +136,20 @@ WHERE
 
 INSERT INTO m_category_question (
   question_id, category_id, updated_at, question_title, in_list)
-SELECT question_id, category_id, '2020-10-10 09:14:00', SUBSTR(question_txt, 0 , 60), 1
+SELECT question_id, category_id, '2020-11-26 09:34:00', SUBSTR(question_txt, 0 , 60), 0
 FROM t_question
-WHERE sequence = 1
-order by category_id , sequence
+WHERE question_id in (
+ ,851	      	
+ ,5077	           
+ ,684		      
+ ,4858	              
+ ,2549	              
+ ,3717	         
+ ,4257	             
+ ,2120	            	 
+ ,1624	            	 
+ ,1172
+)
+
+
+	             
