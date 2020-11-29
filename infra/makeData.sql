@@ -151,5 +151,30 @@ WHERE question_id in (
  ,1172
 )
 
+SELECT
+stock_id,
+date,
+price,
+ratio,
+lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last3,
+round((price / lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio3,
+lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last9,
+round((price / lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio9,
+lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last19,
+round((price / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19
+FROM
+    s_chart
+WHERE stock_id = 9681
+order by date desc
+
+select
+  test2m.key,
+  code1,
+  data1,
+  data2,
+  data3
+from test2m inner join testm on test2m.code1 = testm.key
+;
+
 
 	             

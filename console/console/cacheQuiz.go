@@ -1,4 +1,4 @@
-package main
+package console
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	// "net/http"
 	"database/sql"
 
-	"../common"
+	"../../common"
 	_ "github.com/lib/pq" // this driver for postgres
 
 	// "io/ioutil"
@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func main() {
+func CacheQuiz() {
 	connStr := common.DbConnect
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
