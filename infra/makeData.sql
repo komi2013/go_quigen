@@ -151,30 +151,27 @@ WHERE question_id in (
  ,1172
 )
 
+update s_stock as t1 set ratio_0_1 = t3.ratio_0_1, ratio_1_3 = t3.ratio3, ratio_1_9 = t3.ratio9, ratio_1_19 = t3.ratio19
+from (
+select * from (
 SELECT
 stock_id,
 date,
 price,
-ratio,
+ratio_0_1,
 lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last3,
-round((price / lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio3,
+round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio3,
 lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last9,
-round((price / lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio9,
+round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio9,
 lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last19,
-round((price / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19
+round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19
 FROM
     s_chart
-WHERE stock_id = 9681
-order by date desc
+) as t2
+where t2.date = '2020-11-30'
+) t3
+where t1.stock_id = t3.stock_id
 
-select
-  test2m.key,
-  code1,
-  data1,
-  data2,
-  data3
-from test2m inner join testm on test2m.code1 = testm.key
-;
 
 
 	             

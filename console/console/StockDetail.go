@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	_ "github.com/lib/pq" // this driver for postgres
@@ -19,14 +18,14 @@ func StockDetail() {
 		fmt.Println(err)
 	}
 	defer db.Close()
-	t := time.Now()
-	t = t.AddDate(0, -1, 0)
+	// t := time.Now()
+	// t = t.AddDate(0, -1, 0)
 	// fmt.Println(t.Format("2006-1-2"))
 
-	query := `select stock_id from s_chart
-		where invested_at > $1
-		group by stock_id`
-	rows, err := db.Query(query, t.Format("2006-1-2"))
+	query := `select stock_id from s_chart group by stock_id
+			except
+			select stock_id from s_stock group by stock_id`
+	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -79,7 +78,7 @@ func StockDetail() {
 				profitLast0 = "0"
 			}
 		})
-		fmt.Printf(stockID, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2)
+		fmt.Printf(stockID, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "\n")
 		_, err = db.Exec(`INSERT INTO s_stock (
 			stock_id, market_capitalization, profit_last0, profit_last1, profit_last2, invested_at)
 		VALUES ($1,$2,$3,$4,$5,$6)`, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "2020-11-27")
