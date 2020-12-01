@@ -15,6 +15,8 @@ func main() {
 			console.UpStock()
 		case "StockDetail":
 			console.StockDetail()
+		case "DirectInsert":
+			console.DirectInsert()
 		}
 	}
 }

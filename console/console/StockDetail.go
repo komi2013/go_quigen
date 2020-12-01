@@ -56,6 +56,7 @@ func StockDetail() {
 			fmt.Printf(cell.Text())
 			marketCapitalization = strings.Replace(cell.Text(), ",", "", -1)
 			marketCapitalization = strings.Replace(marketCapitalization, "億円", "", -1)
+			marketCapitalization = strings.Replace(marketCapitalization, "兆", "", -1)
 		})
 		doc.Find("#kobetsu_right > div.gyouseki_block > table > tbody > tr:nth-child(1) > td:nth-child(4)").Each(func(i2 int, cell *goquery.Selection) {
 			fmt.Printf(cell.Text())
@@ -78,7 +79,7 @@ func StockDetail() {
 				profitLast0 = "0"
 			}
 		})
-		fmt.Printf(stockID, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "\n")
+		fmt.Printf(stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "\n")
 		_, err = db.Exec(`INSERT INTO s_stock (
 			stock_id, market_capitalization, profit_last0, profit_last1, profit_last2, invested_at)
 		VALUES ($1,$2,$3,$4,$5,$6)`, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "2020-11-27")
