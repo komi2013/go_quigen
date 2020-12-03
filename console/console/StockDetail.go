@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	_ "github.com/lib/pq" // this driver for postgres
@@ -81,12 +82,36 @@ func StockDetail() {
 		})
 		fmt.Printf(stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "\n")
 		_, err = db.Exec(`INSERT INTO s_stock (
-			stock_id, market_capitalization, profit_last0, profit_last1, profit_last2, invested_at)
-		VALUES ($1,$2,$3,$4,$5,$6)`, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2, "2020-11-27")
+			stock_id, market_capitalization, profit_last0, profit_last1, profit_last2)
+			VALUES ($1,$2,$3,$4,$5)`, stockID, marketCapitalization, profitLast0, profitLast1, profitLast2)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-
+	t := time.Now()
+	_, err = db.Exec(`update s_stock as t1 set ratio_0_1 = t3.ratio, ratio_1_3 = t3.ratio3, ratio_1_9 = t3.ratio9, ratio_1_19 = t3.ratio19, ratio_max = t3.max
+	from (
+	select * from (
+	SELECT
+	stock_id,
+	date,
+	price,
+	ratio,
+	lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last3,
+	round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio3,
+	lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last9,
+	round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio9,
+	lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last19,
+	round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19,
+	round((price / max(price) OVER (PARTITION BY stock_id)  * 100) - 100,2) as max
+	FROM
+		s_chart
+	) as t2
+	where t2.date = $1
+	) t3
+	where t1.stock_id = t3.stock_id`, t.Format("2006-1-2"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	// })
 }

@@ -151,27 +151,33 @@ WHERE question_id in (
  ,1172
 )
 
-update s_stock as t1 set ratio_0_1 = t3.ratio_0_1, ratio_1_3 = t3.ratio3, ratio_1_9 = t3.ratio9, ratio_1_19 = t3.ratio19
+update s_stock as t1 set ratio_0_1 = t3.ratio, ratio_1_3 = t3.ratio3, ratio_1_9 = t3.ratio9, ratio_1_19 = t3.ratio19, ratio_max = t3.max
 from (
 select * from (
 SELECT
 stock_id,
 date,
 price,
-ratio_0_1,
+ratio,
 lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last3,
 round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,3,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio3,
 lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last9,
 round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,9,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio9,
 lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) as last19,
-round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19
+round((lead(price,1,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) / lead(price,19,price) OVER(PARTITION BY stock_id ORDER BY date DESC ) * 100) - 100,2) as ratio19,
+round((price / max(price) OVER (PARTITION BY stock_id)  * 100) - 100,2) as max
 FROM
     s_chart
 ) as t2
-where t2.date = '2020-11-30'
+where t2.date = '2020-12-01'
 ) t3
 where t1.stock_id = t3.stock_id
 
-
-
-	             
+select * from s_stock 
+where ratio_max = 0.00
+and ratio_1_19 < 10 and ratio_1_19 > -3
+and ratio_1_3 < 5 and ratio_1_3 > -3
+and ratio_1_9 > -3
+-- and profit_last0 >= 0 and profit_last1 >= 0
+-- and market_capitalization < 100
+-- and invested_at <> '2020-12-01';
