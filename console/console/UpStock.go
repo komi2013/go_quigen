@@ -38,8 +38,7 @@ func UpStock() {
 		}
 		stockIDs = append(stockIDs, stockID)
 	}
-	// "https://info.finance.yahoo.co.jp/ranking/?kd=1&mk=1&tm=d&vl=a",
-	urls := []string{"https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=2", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=3"}
+	urls := []string{"https://info.finance.yahoo.co.jp/ranking/?kd=1&mk=1&tm=d&vl=a", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=2", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=3"}
 	for i := 0; i < len(urls); i++ {
 		Scraping(urls[i], stockIDs, db)
 	}
@@ -95,10 +94,11 @@ func Scraping(url string, stockIDs []string, db *sql.DB) {
 
 // DirectInsert from manual data
 func DirectInsert() {
-	// stockIDs := []string{"9273", "3994", "2069"}
-	stockIDs := []string{"4481"}
+	stockIDs := []string{"1734", "4447"}
+	// stockIDs := []string{"4481"}
 	for i := 0; i < len(stockIDs); i++ {
-		StockHistory(stockIDs[i])
+		// StockHistory(stockIDs[i])
+		yahooHistory(stockIDs[i])
 	}
 }
 
@@ -142,4 +142,44 @@ func StockHistory(stockID string) {
 			log.Print(err)
 		}
 	}
+}
+func yahooHistory(stockID string) {
+	db, err := sql.Open("postgres", "user=postgres password=sde5tuft dbname=programming sslmode=disable port=5432 host=localhost")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+	res, err := http.Get("https://stocks.finance.yahoo.co.jp/stocks/history/?code=" + stockID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	date := ""
+	price := ""
+	doc.Find(".boardFin td").Each(func(i3 int, cell2 *goquery.Selection) {
+		// fmt.Printf("td %s\n", cell2.Text())
+
+		if i3%7 == 0 {
+			date = strings.Replace(cell2.Text(), "年", "-", -1)
+			date = strings.Replace(date, "月", "-", -1)
+			date = strings.Replace(date, "日", "", -1)
+		}
+		if i3%7 == 6 {
+
+			price = strings.Replace(cell2.Text(), ",", "", -1)
+			fmt.Printf(stockID, price, date, "\n")
+			_, err := db.Exec(`INSERT INTO s_chart (stock_id, price, date)
+								VALUES ($1,$2,$3)`, stockID, price, date)
+			if err != nil {
+				log.Print(err)
+			}
+		}
+	})
 }
