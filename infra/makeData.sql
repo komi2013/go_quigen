@@ -181,3 +181,5 @@ and ratio_1_9 > -3
 -- and profit_last0 >= 0 and profit_last1 >= 0
 -- and market_capitalization < 100
 -- and invested_at <> '2020-12-01';
+
+try_files $uri @go;
