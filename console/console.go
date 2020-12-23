@@ -17,6 +17,9 @@ func main() {
 			console.StockDetail()
 		case "DirectInsert":
 			console.DirectInsert()
+		case "FollowingChart":
+			console.FollowingChart()
 		}
+
 	}
 }

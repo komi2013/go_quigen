@@ -42,6 +42,19 @@ func UpStock() {
 	for i := 0; i < len(urls); i++ {
 		Scraping(urls[i], stockIDs, db)
 	}
+	query = `select stock_id from s_chart
+		group by stock_id
+		having count(*) < 2`
+	rows, err = db.Query(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for rows.Next() {
+		if err := rows.Scan(&stockID); err != nil {
+			fmt.Println(err)
+		}
+		yahooHistory(stockID)
+	}
 	StockDetail()
 }
 
@@ -94,7 +107,7 @@ func Scraping(url string, stockIDs []string, db *sql.DB) {
 
 // DirectInsert from manual data
 func DirectInsert() {
-	stockIDs := []string{"1734", "4447"}
+	stockIDs := []string{"6076"}
 	// stockIDs := []string{"4481"}
 	for i := 0; i < len(stockIDs); i++ {
 		// StockHistory(stockIDs[i])

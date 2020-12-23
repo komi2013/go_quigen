@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -114,4 +115,67 @@ func StockDetail() {
 		log.Fatal(err)
 	}
 	// })
+}
+
+// FollowingChart taking data after invested_at
+func FollowingChart() {
+	db, err := sql.Open("postgres", "user=postgres password=sde5tuft dbname=programming sslmode=disable port=5432 host=localhost")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	query := `select * from (
+		select stock_id, max(date) as max,max(invested_at) as invested_at from s_chart
+		group by stock_id
+		) as t1
+		where max <  (now() - interval '3 days')`
+	rows, err := db.Query(query)
+	if err != nil {
+		fmt.Println(err)
+	}
+	stockID := ""
+	max := ""
+	investedAt := ""
+	for rows.Next() {
+		if err := rows.Scan(&stockID, &max, &investedAt); err != nil {
+			fmt.Println(err)
+		}
+		res, err := http.Get("https://kabutan.jp/stock/kabuka?code=" + stockID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		}
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		ratio := "0"
+		date := ""
+		price := ""
+		for i := 1; i < 30; i++ {
+			s := strconv.Itoa(i)
+			doc.Find("#stock_kabuka_table > table.stock_kabuka_dwm > tbody > tr:nth-child(" + s + ") > th").Each(func(i3 int, v *goquery.Selection) {
+				date = "20" + strings.Replace(v.Text(), "/", "-", -1)
+			})
+			doc.Find("#stock_kabuka_table > table.stock_kabuka_dwm > tbody > tr:nth-child(" + s + ") > td:nth-child(5)").Each(func(i3 int, v *goquery.Selection) {
+				price = strings.Replace(v.Text(), ",", "", -1)
+			})
+			doc.Find("#stock_kabuka_table > table.stock_kabuka_dwm > tbody > tr:nth-child(" + s + ") > td:nth-child(7) > span").Each(func(i3 int, v *goquery.Selection) {
+				ratio = v.Text()
+			})
+			fmt.Printf(stockID, price, date, ratio, "\n")
+			if max < date {
+				_, err = db.Exec(`INSERT INTO s_chart (stock_id, price, date, ratio,invested_at)
+				VALUES ($1,$2,$3,$4,$5)`, stockID, price, date, ratio, investedAt)
+				if err != nil {
+					log.Print(err)
+				}
+			}
+
+		}
+	}
 }
