@@ -8,7 +8,6 @@ import (
 	// "net/http"
 	"database/sql"
 
-	"../../common"
 	_ "github.com/lib/pq" // this driver for postgres
 
 	// "io/ioutil"
@@ -16,9 +15,10 @@ import (
 	"time"
 )
 
+// CacheQuiz is from python
 func CacheQuiz() {
-	connStr := common.DbConnect
-	db, err := sql.Open("postgres", connStr)
+	repo := "juken"
+	db, err := sql.Open("postgres", "user=postgres password=sde5tuft dbname="+repo+" sslmode=disable port=5432 host=localhost")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -63,7 +63,7 @@ func CacheQuiz() {
 		// byteArray, _ := ioutil.ReadAll(resp.Body)
 		// fmt.Println(string(byteArray)) // htmlをstringで取得
 	}
-	parallel(q)
+	parallel(q, repo)
 	_, err = db.Exec(`UPDATE c_resource SET question_id = $1 WHERE category_id = -1`,
 		questionID)
 	if err != nil {
@@ -71,12 +71,12 @@ func CacheQuiz() {
 	}
 	fmt.Println(questionID)
 }
-func parallel(number []string) {
+func parallel(number []string, repo string) {
 	for _, n := range number {
-		time.Sleep(40 * time.Millisecond)
+		time.Sleep(60 * time.Millisecond)
 		go func(n string) {
 			fmt.Println("parallel: ", n)
-			resp, err := http.Get("https://shikaku.quigen.info/quiz/?q=" + n)
+			resp, err := http.Get("https://" + repo + ".quigen.info/quiz/?q=" + n)
 			if err != nil {
 				fmt.Println(err)
 			}

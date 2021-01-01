@@ -174,12 +174,25 @@ where t2.date = '2020-12-01'
 where t1.stock_id = t3.stock_id
 
 select * from s_stock 
-where ratio_max = 0.00
-and ratio_1_19 < 10 and ratio_1_19 > -3
-and ratio_1_3 < 5 and ratio_1_3 > -3
-and ratio_1_9 > -3
--- and profit_last0 >= 0 and profit_last1 >= 0
--- and market_capitalization < 100
--- and invested_at <> '2020-12-01';
+ where ratio_max = 0.00
+ and ratio_1_19 < 5 and ratio_1_19 > -3
+ and ratio_1_3 < 3 and ratio_1_3 > -3
+ and ratio_1_9 > -3
+ and ratio_0_1 > 4
+ and invested_at = '2020-12-23';
 
-try_files $uri @go;
+select round(avg(at_ratio),3),max(at_ratio), min(at_ratio), after_at,count(*)
+from s_chart
+where date > invested_at
+and stock_id in (
+ select stock_id from s_stock 
+ where ratio_max = 0.00
+ and ratio_1_19 < 5 and ratio_1_19 > -3
+ and ratio_1_3 < 3 and ratio_1_3 > -3
+ and ratio_0_1 > 4
+ and ratio_1_9 > -3
+
+)
+group by after_at
+order by after_at
+

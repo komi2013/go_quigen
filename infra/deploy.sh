@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
 cd /Project/go_quigen/
-# arr=("shikaku" "programming" "kids" "english")
-arr=("english")
+# arr=("shikaku" "programming" "kids" "english" "juken")
+arr=("juken")
 d=`date "+%Y%m%d-%H%M%S"`
 for v in "${arr[@]}"
 do

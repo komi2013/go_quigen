@@ -11,6 +11,8 @@ import (
 func main() {
 	for _, v := range os.Args {
 		switch v {
+		case "CacheQuiz":
+			console.CacheQuiz()
 		case "UpStock":
 			console.UpStock()
 		case "StockDetail":
