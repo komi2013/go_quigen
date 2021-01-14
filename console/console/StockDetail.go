@@ -129,7 +129,7 @@ func FollowingChart() {
 		select stock_id, max(date) as max,max(invested_at) as invested_at from s_chart
 		group by stock_id
 		) as t1
-		where max <  (now() - interval '3 days')`
+		where max <  (now() - interval '2 days')`
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)

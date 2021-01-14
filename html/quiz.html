@@ -227,6 +227,11 @@ var q_id = '{{.Q.QuestionID}}';
 var myphoto = '{{.Myphoto}}';
 var etoColor = '{{.EtoColor}}';
 var available = '{{.Available}}';
+var cho0 = '{{.Q.Choice0}}';
+var cho1 = '{{.Q.Choice1}}';
+var cho2 = '{{.Q.Choice2}}';
+var cho3 = '{{.Q.Choice3}}';
+
 
 function shuffle(array) {
   var m = array.length, t, i;
@@ -290,12 +295,12 @@ var app = new Vue({
   el: '#app',
   delimiters: ['[[', ']]'],
   data: {
-    preChoices:['{{.Q.Choice0}}','{{.Q.Choice1}}','{{.Q.Choice2}}','{{.Q.Choice3}}'],
+    preChoices:[cho0,cho1,cho2,cho3],
     choices: shuffle([
-      [0,'{{.Q.Choice0}}','background-color: #F5F5F5;'],
-      [1,'{{.Q.Choice1}}','background-color: #F5F5F5;'],
-      [2,'{{.Q.Choice2}}','background-color: #F5F5F5;'],
-      [3,'{{.Q.Choice3}}','background-color: #F5F5F5;'] ]),
+      [0,cho0,'background-color: #F5F5F5;'],
+      [1,cho1,'background-color: #F5F5F5;'],
+      [2,cho2,'background-color: #F5F5F5;'],
+      [3,cho3,'background-color: #F5F5F5;'] ]),
     choiceTxt: '',
     circle: false,
     cross: false,
