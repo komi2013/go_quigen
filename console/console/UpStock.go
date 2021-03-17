@@ -21,41 +21,44 @@ func UpStock() {
 	}
 	defer db.Close()
 	t := time.Now()
-	t = t.AddDate(0, -1, 0)
+	t = t.AddDate(0, 0, -20)
 
 	query := `select stock_id from s_chart
-		where invested_at > $1
-		group by stock_id`
-	rows, err := db.Query(query, t.Format("2006-1-2"))
+		where chart_id = 1269
+		`
+	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
 	}
 	stockID := ""
-	var stockIDs []string
+	// var stockIDs []string
 	for rows.Next() {
 		if err := rows.Scan(&stockID); err != nil {
 			fmt.Println(err)
 		}
-		stockIDs = append(stockIDs, stockID)
+
+		// stockIDs = append(stockIDs, stockID)
 	}
-	urls := []string{"https://info.finance.yahoo.co.jp/ranking/?kd=1&mk=1&tm=d&vl=a", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=2", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=3"}
-	for i := 0; i < len(urls); i++ {
-		Scraping(urls[i], stockIDs, db)
-	}
-	query = `select stock_id from s_chart
-		group by stock_id
-		having count(*) < 2`
-	rows, err = db.Query(query)
-	if err != nil {
-		fmt.Println(err)
-	}
-	for rows.Next() {
-		if err := rows.Scan(&stockID); err != nil {
-			fmt.Println(err)
-		}
-		yahooHistory(stockID)
-	}
-	StockDetail()
+	fmt.Println(stockID)
+
+	// urls := []string{"https://info.finance.yahoo.co.jp/ranking/?kd=1&mk=1&tm=d&vl=a", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=2", "https://info.finance.yahoo.co.jp/ranking/?kd=1&tm=d&vl=a&mk=1&p=3"}
+	// for i := 0; i < len(urls); i++ {
+	// 	Scraping(urls[i], stockIDs, db)
+	// }
+	// query = `select stock_id from s_chart
+	// 	group by stock_id
+	// 	having count(*) < 2`
+	// rows, err = db.Query(query)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// for rows.Next() {
+	// 	if err := rows.Scan(&stockID); err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	yahooHistory(stockID)
+	// }
+	// StockDetail()
 }
 
 // Scraping focus on scraping

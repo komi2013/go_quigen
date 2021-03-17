@@ -16,7 +16,7 @@ const T1Key = "11111111111111111111111111111111"
 const CsrfKey = "11111111111111111111111111111111"
 
 // DbConnect db connection
-const DbConnect = "user=exam_8099 password=Zk1CGsBK dbname=juken sslmode=disable port=5432 host=localhost"
+const DbConnect = "user=exam_8099 password=Zk1CGsBK dbname=programming sslmode=disable port=5432 host=localhost"
 
 // DateLanguage date format
 const DateLanguage = "yyyy MMM d(w)"

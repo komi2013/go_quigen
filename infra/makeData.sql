@@ -179,9 +179,20 @@ select * from s_stock
  and ratio_1_3 < 3 and ratio_1_3 > -3
  and ratio_1_9 > -3
  and ratio_0_1 > 4
- and invested_at = '2020-12-23';
+ and invested_at = '2021-02-01'
+ order by market_capitalization
+ and market_capitalization < 50
 
-select round(avg(at_ratio),3),max(at_ratio), min(at_ratio), after_at,count(*)
+ --, at_ratio = ratio, 
+update s_chart as t1 set at_price = invested_at, after_at = (date - invested_at)
+from s_chart as t2
+where t1.stock_id = t2.stock_id
+and t1.stock_id = 6440
+
+
+
+select PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY at_ratio),
+  round(avg(at_ratio),3),max(at_ratio), min(at_ratio), after_at,count(*)
 from s_chart
 where date > invested_at
 and stock_id in (
